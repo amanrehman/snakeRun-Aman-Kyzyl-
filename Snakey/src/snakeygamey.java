@@ -2,8 +2,10 @@ import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import javafx.application.Application;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Random;
+import javafx.scene.control.*;
 
 import javafx.animation.*;
 import javafx.util.Duration;
@@ -26,37 +28,120 @@ public class snakeygamey extends Application {
 	private Chain gen;
 	private ArrayList<Block> row=new ArrayList<Block>();
 	private Timeline timeline;
+	private Timeline blockTimeline;
+	private Timeline wallTimeline;
 
     private Pane root;
 
-	private Parent createContent() {
+	private Parent createContent() throws FileNotFoundException {
+		Random r= new Random();
         gen=new Chain();
 		root=new Pane();
 		root.setStyle("-fx-background-color: black;");
 		snake= new Snake(root);
 		root.setPrefSize(360, 640);							//size of window.
+		
+		Button pauseButton=new Button("||");
+		root.getChildren().add(pauseButton);
+		
+		pauseButton.setOnAction(e ->{
+			pause();
+		});
 //        ChainGenerator();
-
-        timer = new AnimationTimer() {						//AnimationTimer is called in each frame.
+		Shield shield =new Shield();
+		Magnet magnet=new Magnet();
+		Ball ball= new Ball();
+		Destroy destroy=new Destroy();
+		Wall wall=new Wall();
+		Coin coin= new Coin();
+		
+        timer = new AnimationTimer() {						
             @Override
             public void handle(long now) {
             	snake.updatemovement();
-                onUpdate();
+            	shield.updatemovement(root);
+            	magnet.updatemovement(root);
+            	ball.updatemovement(root);
+            	destroy.updatemovement(root);
+            	coin.updatemovement(root);
+            	wall.updatemovent(root);
+            	onUpdate();
             }
         };
         timer.start();
-
-        timeline = new Timeline(
+        
+        timeline = new Timeline();
+        timeline.setCycleCount(timeline.INDEFINITE);
+        KeyFrame shieldtime = 
+        		 new KeyFrame(Duration.seconds(r.nextInt(30)), e -> {
+ 	    			shield.generatenewtoken(root);
+ 	    });
+        timeline.getKeyFrames().add(shieldtime);
+        KeyFrame magnettime = 
+       		 new KeyFrame(Duration.seconds(r.nextInt(30)), e -> {
+	    			magnet.generatenewtoken(root);
+	    });
+        timeline.getKeyFrames().add(magnettime);
+        KeyFrame balltime = 
+      		 new KeyFrame(Duration.seconds(r.nextInt(30)), e -> {
+	    			ball.generatenewtoken(root);
+	    });
+        timeline.getKeyFrames().add(balltime);
+        KeyFrame destroytime = 
+     		 new KeyFrame(Duration.seconds(r.nextInt(30)), e -> {
+	    			destroy.generatenewtoken(root);
+	    });
+        timeline.getKeyFrames().add(destroytime);
+        KeyFrame cointime = 
+     		 new KeyFrame(Duration.seconds(r.nextInt(30)), e -> {
+	    			coin.generatenewtoken(root);
+	    });
+        timeline.getKeyFrames().add(cointime);
+        timeline.play();
+        
+        
+        blockTimeline = new Timeline(
         	    new KeyFrame(Duration.seconds(2.5
         	    		), e -> {
         	        ChainGenerator();
         	    })
         	);
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        blockTimeline.setCycleCount(Animation.INDEFINITE);
+        blockTimeline.play();
 
+        wallTimeline = new Timeline(
+        	    new KeyFrame(Duration.seconds(2.5
+        	    		), e -> {
+        	        wall.create(root);
+        	    })
+        	);
+        wallTimeline.setCycleCount(Animation.INDEFINITE);
+        wallTimeline.play();
+        
         return root;
     }
+	
+	private void pause() {
+		timer.stop();
+		timeline.pause();
+		blockTimeline.pause();
+		wallTimeline.pause();
+		Pane pausePane=new Pane();
+		Button restartButton=new Button("Restart");
+		pausePane.getChildren().add(restartButton);
+		
+		Scene pause=new Scene(pausePane, 360, 640);
+		
+		Stage currentStage=(Stage) root.getScene().getWindow();
+		Scene previousScene=currentStage.getScene();
+		currentStage.setScene(pause);
+		restartButton.setOnAction(e ->{
+			timer.start();
+			timeline.play();
+			blockTimeline.play();
+			currentStage.setScene(previousScene);
+		});
+	}
 
 	public void ChainGenerator() {
 		row=gen.generateRow();
@@ -86,12 +171,9 @@ public class snakeygamey extends Application {
 		{	
 			Text val = new Text ("");
 			val.setX(rect.getX()+36);
-
-			System.out.println(constituentRectanglesList.size());
 			val.setFill(Color.WHITE);
 			stack.getChildren().addAll(rect);
 		}
-		System.out.println();
 		onUpdate();
 		
 		
@@ -106,12 +188,12 @@ public class snakeygamey extends Application {
 		for(Block rect: row) {			
 			rect.getR().setTranslateY(rect.getR().getTranslateY()+speed);
 			
-			System.out.println(rect.getR().getTranslateY()+speed);
+//			System.out.println(rect.getR().getTranslateY()+speed);
 			Text val = new Text ("");
 			val.setX(rect.getX()+36);
 			val.setTranslateY(rect.getR().getTranslateY()+speed);
 
-			System.out.println(row.size());
+//			System.out.println(row.size());
 			val.setFill(Color.WHITE);
 			stack.getChildren().addAll(rect, val);
 			if(rect.getR().getTranslateY()+speed>500) {
@@ -129,13 +211,15 @@ public class snakeygamey extends Application {
 //				root.getChildren().remove(snakeHead);
 	            timer.stop();
 	            timeline.stop();
-	            String win = "reKt";
+	            blockTimeline.stop();
+	            wallTimeline.stop();
+	            String gameover = "G4m3 0v3R";
 	            HBox hBox = new HBox();
-	            hBox.setTranslateY(0);
-	            hBox.setTranslateX(0);
+	            hBox.setTranslateY(300);
+	            hBox.setTranslateX(50);
 	            root.getChildren().add(hBox);
-	            for (int i = 0; i < win.toCharArray().length; i++) {
-	            	char letter = win.charAt(i);
+	            for (int i = 0; i < gameover.toCharArray().length; i++) {
+	            	char letter = gameover.charAt(i);
 	            	Text text = new Text(String.valueOf(letter));
 	                text.setFont(Font.font(48));
 	                text.setOpacity(0);
@@ -157,36 +241,75 @@ public class snakeygamey extends Application {
 	}
 	@Override
 	public void start(Stage stage) throws Exception {
-        stage.setScene(new Scene(createContent()));
-        stage.getScene().setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case LEFT:
-                	TranslateTransition t= new TranslateTransition();
-                	t.setDuration(Duration.millis(25));
-                	t.setToX(snake.getTranslateX()-5);
-                	t.setToY(snake.getTranslateY());
-                	t.setNode(snake.trail.tailtrail.get(0));
-                	t.play();
-                	//snake.setTranslateX(snake.getTranslateX()-5);
-            		//snake.updateleftmovement();
-                	break;
-                case RIGHT:
-                	t= new TranslateTransition();
-                	t.setDuration(Duration.millis(25));
-                	t.setToX(snake.getTranslateX()+5);
-                	t.setToY(snake.getTranslateY());
-                	t.setNode(snake.trail.tailtrail.get(0));
-                	t.play();
-                	
-                	//snake.setTranslateX(snake.getTranslateX()+5);
-            		//snake.updaterightmovement();
-            		break;
-                default:
-                    break;
-            }
-        });
-        stage.getScene().setOnMouseMoved(mouseHandler);
-        stage.show();
+		MainMenu elements=new MainMenu();
+		Pane mainMenuPane=new Pane();
+		mainMenuPane.setStyle("-fx-background-color: black");
+		mainMenuPane.setPrefSize(360, 640);
+		Button startButton=elements.createStartButton();
+		Button leadButton=elements.createLeadButton();
+
+		mainMenuPane.getChildren().addAll(startButton, leadButton);
+		Scene main=new Scene(mainMenuPane,360,640);
+
+		stage.setScene(main);
+		stage.show();
+		
+		startButton.setOnAction(e -> {
+			try {
+				stage.setScene(new Scene(createContent()));
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	        stage.getScene().setOnKeyPressed(event -> {
+	            switch (event.getCode()) {
+	                case LEFT:
+	                	TranslateTransition t= new TranslateTransition();
+	                	t.setDuration(Duration.millis(25));
+	                	t.setToX(snake.getTranslateX()-5);
+	                	t.setToY(snake.getTranslateY());
+	                	t.setNode(snake.trail.tailtrail.get(0));
+	                	t.play();
+	                	//snake.setTranslateX(snake.getTranslateX()-5);
+	            		//snake.updateleftmovement();
+	                	break;
+	                case RIGHT:
+	                	t= new TranslateTransition();
+	                	t.setDuration(Duration.millis(25));
+	                	t.setToX(snake.getTranslateX()+5);
+	                	t.setToY(snake.getTranslateY());
+	                	t.setNode(snake.trail.tailtrail.get(0));
+	                	t.play();
+	                	
+	                	//snake.setTranslateX(snake.getTranslateX()+5);
+	            		//snake.updaterightmovement();
+	            		break;
+	                default:
+	                    break;
+	            }
+	        });
+	        stage.getScene().setOnMouseMoved(mouseHandler);
+ 		});
+		
+		leadButton.setOnAction(e ->{
+			Pane leadPane=new Pane();
+			
+			Button goBack=new Button("Go Back");
+			leadPane.getChildren().add(goBack);
+			
+			Scene leadScene=new Scene(leadPane, 360,640);
+			Scene previousScreen=stage.getScene();
+		    
+			Leaderboard leaderTable=new Leaderboard();
+			TableView table=leaderTable.createTable();
+
+			leadPane.getChildren().add(table);
+	        stage.setScene(leadScene);
+
+			goBack.setOnAction(e2 ->{
+				stage.setScene(previousScreen);
+			});
+		});    
 	}
 	EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
 		 @Override

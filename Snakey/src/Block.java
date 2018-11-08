@@ -4,7 +4,7 @@ import javafx.scene.shape.Rectangle;
 
 public class Block extends Rectangle{
 	private Rectangle r;
-	private static int value;
+	private int value;
 	private int positionX;
 
 	public Block() {
@@ -31,12 +31,12 @@ public class Block extends Rectangle{
 		this.r=r;
 	}
 
-	public static int getValue() {
+	public int getValue() {
 		return value;
 	}
 
-	public static void setValue(int value) {
-		Block.value = value;
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 	public int getPositionX() {
@@ -47,14 +47,14 @@ public class Block extends Rectangle{
 		this.positionX = positionX;
 	}
 
-	private static int generateValue() {
+	private int generateValue() {
 		Random r=new Random();
 		value=(int) r.nextInt(10);
 
 		return value;
 	}
 
-	public static Rectangle generateBlock() {
+	public Rectangle generateBlock() {
 		Rectangle block = new Rectangle(75, 75, Color.web("#EDF060"));
 		block.setArcWidth(40.0); 
 		block.setArcHeight(30.0);
@@ -62,7 +62,8 @@ public class Block extends Rectangle{
 	}
 
 	public static Block newBlock() {
-		return new Block(generateBlock(), generateValue());
+		Block b= new Block();
+		return new Block(b.generateBlock(), b.generateValue());
 	}
 				
 //	public static void main(String[] args) {
