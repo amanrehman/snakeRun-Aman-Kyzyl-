@@ -41,14 +41,14 @@ abstract class Token {
         c.setTranslateY(imageView.getY()+10);
         root.getChildren().addAll(imageView,c);
     }
-    public void updatemovement(Pane root) {
+    public void updatemovement(Pane root, int speed) {
     	if(imageView!=null) 
     	{
 			if(imageView.getY()<640) {
 				this.positionX=(int) imageView.getX();
-		    	this.positionY=(int) (imageView.getY()+5);
+		    	this.positionY=(int) (imageView.getY()+speed);
 				imageView.setX(imageView.getX()); 
-				imageView.setY(imageView.getY()+5);
+				imageView.setY(imageView.getY()+speed);
 				c.setTranslateX(imageView.getX());
 		        c.setTranslateY(imageView.getY());
 			}

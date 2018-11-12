@@ -30,8 +30,8 @@ public class snakeygamey extends Application {
 	private Timeline timeline;
 	private Timeline blockTimeline;
 	private Timeline wallTimeline;
-
     private Pane root;
+	private static final int speed=4;
 
 	private Parent createContent() throws FileNotFoundException {
 		Random r= new Random();
@@ -59,12 +59,12 @@ public class snakeygamey extends Application {
             @Override
             public void handle(long now) {
             	snake.updatemovement();
-            	shield.updatemovement(root);
-            	magnet.updatemovement(root);
-            	ball.updatemovement(root);
-            	destroy.updatemovement(root);
-            	coin.updatemovement(root);
-            	wall.updatemovent(root);
+            	shield.updatemovement(root,speed);
+            	magnet.updatemovement(root,speed);
+            	ball.updatemovement(root,speed);
+            	destroy.updatemovement(root,speed);
+            	coin.updatemovement(root,speed);
+            	wall.updatemovent(root,speed);
             	onUpdate();
             }
         };
@@ -144,13 +144,18 @@ public class snakeygamey extends Application {
 	}
 
 	public void ChainGenerator() {
+		
 		row=gen.generateRow();
 //		Rectangle[] constituentRectangles = new Rectangle[5];
 		ArrayList<Rectangle> constituentRectanglesList = new ArrayList<Rectangle>();
+		ArrayList<Text> constituentValList = new ArrayList<Text>();
 	
 //		for(int i=0;i<5;i++) constituentRectangles[i]=row[i].getR();
 		
-		for(int i=0;i<5;i++) constituentRectanglesList.add(row.get(i).getR());
+		for(int i=0;i<5;i++) {
+			constituentRectanglesList.add(row.get(i).getR());
+			constituentValList.add(row.get(i).getTextValue());			
+		}
 
 		Random ran=new Random();
 		double probability= ran.nextDouble();
@@ -160,47 +165,36 @@ public class snakeygamey extends Application {
 			while(howManyToDel>0) {
 				int index=ran.nextInt(constituentRectanglesList.size()-1)+1;
 				constituentRectanglesList.remove(index);
+				constituentValList.remove(index);
 				row.remove(index);
 				howManyToDel--;
 			}
 		}
 
 		
-		Group stack = new Group();		
+		Group rectStack = new Group();
+		Group textStack=new Group();
+
 		for (Rectangle rect: constituentRectanglesList)
 		{	
-			Text val = new Text ("");
-			val.setX(rect.getX()+36);
-			val.setFill(Color.WHITE);
-			stack.getChildren().addAll(rect);
-		}
-		onUpdate();
-		
-		
-		//root.getChildren().addAll(constituentRectanglesList);
-		
-		root.getChildren().addAll(stack);
-	}
-	
-	private void onUpdate() {
-		int speed=5;
-		Group stack = new Group();	
-		for(Block rect: row) {			
-			rect.getR().setTranslateY(rect.getR().getTranslateY()+speed);
-			
-//			System.out.println(rect.getR().getTranslateY()+speed);
-			Text val = new Text ("");
-			val.setX(rect.getX()+36);
-			val.setTranslateY(rect.getR().getTranslateY()+speed);
+			int index=constituentRectanglesList.indexOf(rect);
 
-//			System.out.println(row.size());
-			val.setFill(Color.WHITE);
-			stack.getChildren().addAll(rect, val);
-			if(rect.getR().getTranslateY()+speed>500) {
-				stack.getChildren().remove(rect);
-			}
+			Text val = constituentValList.get(index);
+			val.setX(rect.getX()+36);
+			val.setY(36);
+			val.setFill(Color.BLACK);
+
+			rectStack.getChildren().addAll(rect);
+			textStack.getChildren().addAll(val);
 		}
-		root.getChildren().addAll(stack);
+		root.getChildren().addAll(rectStack, textStack);
+	}
+
+	private void onUpdate() {
+		for(Block block: row) {			
+			block.getR().setTranslateY(block.getR().getTranslateY()+speed);
+			block.getTextValue().setTranslateY(block.getR().getTranslateY()+speed);
+		}
 		checkState();
     }
 	private void checkState() {

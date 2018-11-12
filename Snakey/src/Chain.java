@@ -18,28 +18,12 @@ public class Chain {
 	}
 
 	public void generatePositionX() {
-		//new Chain();
 		Random r=new Random();
 
 		for(int i=0;i<5;i++) {
 			int pos=r.nextInt(positions.size()-1)+1;
-			
-			row.get(i).setPositionX(positions.get(pos));
-			row.get(i).getR().setTranslateX(row.get(i).getPositionX());
-			row.get(i).getR().setTranslateY(0);
-//			System.out.println(positions.get(pos)+" "+positions.size());
+			row.get(i).getR().setX(positions.get(pos));
 			positions.remove(pos);
-
-//				if(flag[i]!=1) {
-//				row[i].setPositionX(positionArray[pos]);
-//				row[i].getR().setTranslateX(row[i].getPositionX());
-//				row[i].getR().setTranslateY(0);
-//				System.out.println(i+" "+pos+" "+positionArray[pos]);
-
-//			}
-//			flag[pos]=1;
-
-		//	if(positions.isEmpty()) break;
 		}
 	}
 
@@ -63,6 +47,7 @@ public class Chain {
 		return row;
 	}
 
+	
 	public void generator() {
 		generateRow();
 	}

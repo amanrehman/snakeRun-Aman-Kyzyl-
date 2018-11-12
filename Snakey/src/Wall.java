@@ -47,12 +47,12 @@ public class Wall{
 
 		root.getChildren().add(rec);
 	}
-	public void updatemovent(Pane root) {
+	public void updatemovent(Pane root, int speed) {
 		if(rec!=null) 
     	{
 			if(rec.getTranslateY()<640) {
 				rec.setTranslateX(rec.getTranslateX()); 
-				rec.setTranslateY(rec.getTranslateY()+5);
+				rec.setTranslateY(rec.getTranslateY()+speed);
 			}
 			else {
 				root.getChildren().remove(rec);
