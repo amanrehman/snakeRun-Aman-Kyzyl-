@@ -31,7 +31,7 @@ public class snakeygamey extends Application {
 	private Timeline blockTimeline;
 	private Timeline wallTimeline;
     private Pane root;
-	private static final int speed=4;
+	private static final int speed=5;
 
 	private Parent createContent() throws FileNotFoundException {
 		Random r= new Random();
