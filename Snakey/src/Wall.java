@@ -10,7 +10,6 @@ import java.util.Random;
 import javafx.application.Application;
 
 public class Wall{
-	Random r=new Random();
 	Rectangle rec;
 	private int positionX;
 	private int positionY;
@@ -19,6 +18,14 @@ public class Wall{
 		rec=new Rectangle();
 		rec.setArcWidth(40.0); 
 		rec.setArcHeight(30.0);
+	}
+
+	public Rectangle getRec() {
+		return rec;
+	}
+
+	public void setRec(Rectangle rec) {
+		this.rec = rec;
 	}
 
 	public int getPositionX() {
@@ -38,6 +45,7 @@ public class Wall{
 	}
 
 	public void create(Pane root) {
+		Random r=new Random();
 		rec=new Rectangle(5,r.nextInt(200)+20, Color.WHITE);
 		setPositionX(0);
 		rec.setX((r.nextInt(4)+1)*72);

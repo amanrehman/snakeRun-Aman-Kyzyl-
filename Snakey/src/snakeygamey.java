@@ -5,6 +5,9 @@ import javafx.application.Application;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Random;
+
+import javax.swing.plaf.basic.BasicTabbedPaneUI.MouseHandler;
+
 import javafx.scene.control.*;
 
 import javafx.animation.*;
@@ -31,7 +34,13 @@ public class snakeygamey extends Application {
 	private Timeline blockTimeline;
 	private Timeline wallTimeline;
     private Pane root;
-	private static final int speed=5;
+	private static final int speed=3;
+	Shield shield;
+	Magnet magnet;
+	Ball ball;
+	Destroy destroy;
+	Wall wall;
+	Coin coin;
 
 	private Parent createContent() throws FileNotFoundException {
 		Random r= new Random();
@@ -41,6 +50,12 @@ public class snakeygamey extends Application {
 		snake= new Snake(root);
 		root.setPrefSize(360, 640);							//size of window.
 		
+		shield =new Shield();
+		magnet=new Magnet();
+		ball= new Ball();
+		destroy=new Destroy();
+		wall=new Wall();
+		coin= new Coin();
 		Button pauseButton=new Button("||");
 		root.getChildren().add(pauseButton);
 		
@@ -48,12 +63,12 @@ public class snakeygamey extends Application {
 			pause();
 		});
 //        ChainGenerator();
-		Shield shield =new Shield();
-		Magnet magnet=new Magnet();
-		Ball ball= new Ball();
-		Destroy destroy=new Destroy();
-		Wall wall=new Wall();
-		Coin coin= new Coin();
+		shield =new Shield();
+		magnet=new Magnet();
+		ball= new Ball();
+		destroy=new Destroy();
+		wall=new Wall();
+		coin= new Coin();
 		
         timer = new AnimationTimer() {						
             @Override
@@ -227,12 +242,17 @@ public class snakeygamey extends Application {
 	                }
 	        }
 		}
-		if(row.size()!=0)
-			if(row.get(0).getTranslateX()>=640) {
-				for(Block r:row)
-					root.getChildren().remove(r.getR());
-			}
+		
+		if(wall.getRec().getBoundsInParent().intersects(snakeHead.getBoundsInParent())) {
+			System.out.println("...");
+			System.out.println(snakeHead.getBoundsInParent());
+//			snakeHead.setLayoutX(snakeHead.getLayoutX());
+//			snakeHead.setTranslateX(snake.trail.tailtrail.get(1).getTranslateX());
+//			snake.updatemovement();
+			mouseHandler.
+		}
 	}
+
 	@Override
 	public void start(Stage stage) throws Exception {
 		MainMenu elements=new MainMenu();
@@ -247,7 +267,7 @@ public class snakeygamey extends Application {
 
 		stage.setScene(main);
 		stage.show();
-		
+
 		startButton.setOnAction(e -> {
 			try {
 				stage.setScene(new Scene(createContent()));
@@ -316,6 +336,7 @@ public class snakeygamey extends Application {
 	        	t.play();
 	        }
 	};
+
 	public static void main(String[] args) {
         launch(args);
     }

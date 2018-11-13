@@ -27,7 +27,7 @@ public class Snake {
 		this.speed = speed;
 	}
 	public Snake(Pane root) {
-		length=70;
+		length=4;
 		snakelength=new Text(Integer.toString(length));
 		snakelength.setFill(Color.WHITE);
 		trail=new Trail(root,length,180,360,snakelength);
