@@ -4,10 +4,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 public class Snake {
-	int length;
-	Trail trail;
-	int speed;
-	Text snakelength;
+	private int length;
+	private Trail trail;
+	private int speed;
+	private Text snakelength;
+
 	public int getLength() {
 		return length;
 	}
@@ -26,32 +27,54 @@ public class Snake {
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}
+	public Text getSnakelength() {
+		return snakelength;
+	}
+	public void setSnakelength(Text snakelength) {
+		this.snakelength = snakelength;
+	}
 	public Snake(Pane root) {
-		length=4;
+		length=50;
 		snakelength=new Text(Integer.toString(length));
 		snakelength.setFill(Color.WHITE);
 		trail=new Trail(root,length,180,360,snakelength);
 	}
 	public void setTranslateY(int y) {
-		trail.tailtrail.get(0).setTranslateY(y);
+		trail.getTailtrail().get(0).setTranslateY(y);
 	}
 	public void setTranslateX(int x) {
-		trail.tailtrail.get(0).setTranslateX(x);
+		trail.getTailtrail().get(0).setTranslateX(x);
 	}
+
 	public int getTranslateY() {
-		return (int) trail.tailtrail.get(0).getTranslateY();
+		return (int) trail.getTailtrail().get(0).getTranslateY();
 	}
+
 	public int getTranslateX() {
-		return (int) trail.tailtrail.get(0).getTranslateX();
+		return (int) trail.getTailtrail().get(0).getTranslateX();
 	}
-	public void updatemovement() {
-		snakelength.setX(trail.tailtrail.get(0).getTranslateX()+175);
+
+	public void updatemovement(Pane root) {
+		if(!snakelength.getText().equals(Integer.toString(length))) {
+			root.getChildren().remove(snakelength);
+			snakelength=new Text(Integer.toString(length));
+			snakelength.setFill(Color.WHITE);
+			snakelength.setX(180);
+			snakelength.setY(340);
+//			System.out.println(trail.getTailtrail().get(0).getTranslateY()-20);
+			root.getChildren().add(snakelength);
+		}
+		
+		if(trail.getTailtrail().size()!=0) snakelength.setX(trail.getTailtrail().get(0).getTranslateX()+175);
+		else {
+			snakelength=new Text("0");
+		}
 		for(int i=1;i<length;i++) {
 			TranslateTransition t= new TranslateTransition();
         	t.setDuration(Duration.millis(35));
-        	t.setToX(trail.tailtrail.get(i-1).getTranslateX());
+        	t.setToX(trail.getTailtrail().get(i-1).getTranslateX());
         	t.setToY(getTranslateY());
-        	t.setNode(trail.tailtrail.get(i));
+        	t.setNode(trail.getTailtrail().get(i));
         	t.play();
 		}	
 	}

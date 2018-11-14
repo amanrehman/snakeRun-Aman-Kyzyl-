@@ -14,6 +14,6 @@ public class Ball extends Token{
     Ball() throws FileNotFoundException{
     	image= new Image(new FileInputStream(".\\ball.png"));
     	imageView = new ImageView(image);
-    	c=new Circle(0,0,20,Color.rgb(0, 0, 0, 0));
+    	c=new Circle(0,0,20,Color.rgb(255, 0, 0, 1));
     }
 }

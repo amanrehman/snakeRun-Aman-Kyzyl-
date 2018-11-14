@@ -11,11 +11,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 public class Coin{	
-	Random r=new Random();
-	Image image;
-	Group img;
-	ImageView imageView;
-	Circle c;
+	private Image image;
+	private Group img;
+	private ImageView imageView;
+	private Circle c;
 		
 	private int positionX;
 	private int positionY;
@@ -30,6 +29,56 @@ public class Coin{
     }
     
    
+	public Image getImage() {
+		return image;
+	}
+
+
+	public void setImage(Image image) {
+		this.image = image;
+	}
+
+
+	public Group getImg() {
+		return img;
+	}
+
+
+	public void setImg(Group img) {
+		this.img = img;
+	}
+
+
+	public ImageView getImageView() {
+		return imageView;
+	}
+
+
+	public void setImageView(ImageView imageView) {
+		this.imageView = imageView;
+	}
+
+
+	public Circle getC() {
+		return c;
+	}
+
+
+	public void setC(Circle c) {
+		this.c = c;
+	}
+
+
+	public int getFrequency() {
+		return frequency;
+	}
+
+
+	public void setFrequency(int frequency) {
+		this.frequency = frequency;
+	}
+
+
 	public int getPositionX() {
 		return positionX;
 	}
@@ -46,6 +95,7 @@ public class Coin{
 		this.positionY = positionY;
 	}
     public void generatenewtoken(Pane root) {
+    	Random r=new Random();
     	this.positionX=(r.nextInt(320)+20);
     	this.positionY=0;
     	imageView.setX(r.nextInt(320)+20); 

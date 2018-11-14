@@ -32,7 +32,55 @@ abstract class Token {
 	public void setPositionY(int positionY) {
 		this.positionY = positionY;
 	}
-    public void generatenewtoken(Pane root) {
+    public Random getR() {
+		return r;
+	}
+
+	public void setR(Random r) {
+		this.r = r;
+	}
+
+	public Image getImage() {
+		return image;
+	}
+
+	public void setImage(Image image) {
+		this.image = image;
+	}
+
+	public Group getImg() {
+		return img;
+	}
+
+	public void setImg(Group img) {
+		this.img = img;
+	}
+
+	public ImageView getImageView() {
+		return imageView;
+	}
+
+	public void setImageView(ImageView imageView) {
+		this.imageView = imageView;
+	}
+
+	public Circle getC() {
+		return c;
+	}
+
+	public void setC(Circle c) {
+		this.c = c;
+	}
+
+	public int getFrequency() {
+		return frequency;
+	}
+
+	public void setFrequency(int frequency) {
+		this.frequency = frequency;
+	}
+
+	public void generatenewtoken(Pane root) {
     	this.positionX=(r.nextInt(320)+20);
     	this.positionY=0;
     	imageView.setX(r.nextInt(320)+20); 

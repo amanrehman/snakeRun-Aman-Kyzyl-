@@ -6,9 +6,10 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 public class Trail{
-	ObservableList<Node> tailtrail;
-	Group snakeBody;
-	int initialPosX, initialPosY;
+	private ObservableList<Node> tailtrail;
+	private Group snakeBody;
+	private int initialPosX, initialPosY;
+
 	public Trail(Pane root,int length, int initialPosX, int initialPosY,Text snakelength) {
 		snakeBody = new Group();
 		this.initialPosX=initialPosX;
@@ -18,6 +19,23 @@ public class Trail{
 		root.getChildren().add(snakelength);
 		updateTrail(root, length);
 	}
+
+	public ObservableList<Node> getTailtrail() {
+		return tailtrail;
+	}
+
+	public void setTailtrail(ObservableList<Node> tailtrail) {
+		this.tailtrail = tailtrail;
+	}
+
+	public Group getSnakeBody() {
+		return snakeBody;
+	}
+
+	public void setSnakeBody(Group snakeBody) {
+		this.snakeBody = snakeBody;
+	}
+
 	public void updateTrail(Pane root, int length) {
 		tailtrail = snakeBody.getChildren();
 		for(int i=0;i<length;i++) {
