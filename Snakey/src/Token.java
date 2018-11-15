@@ -7,7 +7,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView; 
 
 abstract class Token {
-	Random r=new Random();
 	Image image;
 	Group img;
 	ImageView imageView;
@@ -31,13 +30,6 @@ abstract class Token {
 
 	public void setPositionY(int positionY) {
 		this.positionY = positionY;
-	}
-    public Random getR() {
-		return r;
-	}
-
-	public void setR(Random r) {
-		this.r = r;
 	}
 
 	public Image getImage() {
@@ -81,6 +73,7 @@ abstract class Token {
 	}
 
 	public void generatenewtoken(Pane root) {
+		Random r=new Random();
     	this.positionX=(r.nextInt(320)+20);
     	this.positionY=0;
     	imageView.setX(r.nextInt(320)+20); 

@@ -8,18 +8,26 @@ import javafx.scene.layout.Pane;
 public class Trail{
 	private ObservableList<Node> tailtrail;
 	private Group snakeBody;
+	private Group hiddenSnakeBody;
 	private int initialPosX, initialPosY;
 
 	public Trail(Pane root,int length, int initialPosX, int initialPosY,Text snakelength) {
 		snakeBody = new Group();
+		hiddenSnakeBody=new Group();
+		addToHiddenSnakeBody();
 		this.initialPosX=initialPosX;
 		this.initialPosY=initialPosY;
 		snakelength.setX(initialPosX);
 		snakelength.setY(initialPosY-20);
 		root.getChildren().add(snakelength);
 		updateTrail(root, length);
+		root.getChildren().addAll(snakeBody);
 	}
 
+	private void addToHiddenSnakeBody() {
+		for(int i=0;i<Snake.hiddenLength;i++)
+			hiddenSnakeBody.getChildren().add(new Circle(initialPosX,initialPosY+(i*20),10,Color.WHITESMOKE));
+	}
 	public ObservableList<Node> getTailtrail() {
 		return tailtrail;
 	}
@@ -41,7 +49,7 @@ public class Trail{
 		for(int i=0;i<length;i++) {
 			tailtrail.add(new Circle(initialPosX,initialPosY+(i*20),10,Color.WHITESMOKE));
 		}
-		root.getChildren().addAll(snakeBody);
+//		root.getChildren().addAll(snakeBody);
 	}
 
 }
