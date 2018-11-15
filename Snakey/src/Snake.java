@@ -5,6 +5,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 public class Snake {
 	private int length;
+	static int hiddenLength=92;
 	private Trail trail;
 	private int speed;
 	private Text snakelength;
@@ -15,33 +16,48 @@ public class Snake {
 	public void setLength(int length) {
 		this.length = length;
 	}
+	public int getHiddenLength() {
+		return hiddenLength;
+	}
+	public void setHiddenLength(int hiddenLength) {
+		this.hiddenLength = hiddenLength;
+	}
 	public Trail getTrail() {
 		return trail;
 	}
+
 	public void setTrail(Trail trail) {
 		this.trail = trail;
 	}
+
 	public int getSpeed() {
 		return speed;
 	}
+
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}
+
 	public Text getSnakelength() {
 		return snakelength;
 	}
+
 	public void setSnakelength(Text snakelength) {
 		this.snakelength = snakelength;
 	}
+
 	public Snake(Pane root) {
-		length=50;
+		length=8;
+//		hiddenLength=92;
 		snakelength=new Text(Integer.toString(length));
 		snakelength.setFill(Color.WHITE);
 		trail=new Trail(root,length,180,360,snakelength);
 	}
+
 	public void setTranslateY(int y) {
 		trail.getTailtrail().get(0).setTranslateY(y);
 	}
+
 	public void setTranslateX(int x) {
 		trail.getTailtrail().get(0).setTranslateX(x);
 	}
@@ -64,11 +80,10 @@ public class Snake {
 //			System.out.println(trail.getTailtrail().get(0).getTranslateY()-20);
 			root.getChildren().add(snakelength);
 		}
-		
+
 		if(trail.getTailtrail().size()!=0) snakelength.setX(trail.getTailtrail().get(0).getTranslateX()+175);
-		else {
-			snakelength=new Text("0");
-		}
+		else snakelength=new Text("1");
+
 		for(int i=1;i<length;i++) {
 			TranslateTransition t= new TranslateTransition();
         	t.setDuration(Duration.millis(35));
