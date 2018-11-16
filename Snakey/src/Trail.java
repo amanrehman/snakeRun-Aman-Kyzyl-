@@ -14,7 +14,7 @@ public class Trail{
 	public Trail(Pane root,int length, int initialPosX, int initialPosY,Text snakelength) {
 		snakeBody = new Group();
 		hiddenSnakeBody=new Group();
-		addToHiddenSnakeBody();
+//		addToHiddenSnakeBody();
 		this.initialPosX=initialPosX;
 		this.initialPosY=initialPosY;
 		snakelength.setX(initialPosX);
@@ -24,10 +24,10 @@ public class Trail{
 		root.getChildren().addAll(snakeBody);
 	}
 
-	private void addToHiddenSnakeBody() {
-		for(int i=0;i<Snake.hiddenLength;i++)
-			hiddenSnakeBody.getChildren().add(new Circle(initialPosX,initialPosY+(i*20),10,Color.WHITESMOKE));
-	}
+////	private void addToHiddenSnakeBody() {
+//		for(int i=0;i<Snake.hiddenLength;i++)
+//			hiddenSnakeBody.getChildren().add(new Circle(initialPosX,initialPosY+(i*20),10,Color.WHITESMOKE));
+//	}
 	public ObservableList<Node> getTailtrail() {
 		return tailtrail;
 	}

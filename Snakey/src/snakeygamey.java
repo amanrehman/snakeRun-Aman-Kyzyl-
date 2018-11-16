@@ -34,7 +34,7 @@ public class snakeygamey extends Application {
 	private Timeline blockTimeline;
 	private Timeline wallTimeline;
     private Pane root;
-	private static final int speed=3;
+	private static final int speed=5;
 	private Shield shield;
 	private Magnet magnet;
 	private Ball ball;
@@ -42,8 +42,9 @@ public class snakeygamey extends Application {
 	private Wall wall;
 	private Coin coin;
 	private int blockFlag;
-	private int flag;
+	private int ballFlag,shieldFlag,magnetFlag,destroyFlag,coinFlag;
 	private int shieldPower;
+	private int collidingFlag;
 	private static final int tokenDuration=10;
 	
 	private Parent createContent() throws FileNotFoundException {
@@ -61,7 +62,7 @@ public class snakeygamey extends Application {
 		wall=new Wall();
 		coin= new Coin();
 		blockFlag=0;
-		flag=0;
+		collidingFlag=0;
 		shieldPower=0;
 		Button pauseButton=new Button("||");
 		root.getChildren().add(pauseButton);
@@ -96,31 +97,31 @@ public class snakeygamey extends Application {
         timeline.setCycleCount(timeline.INDEFINITE);
         KeyFrame shieldtime = 
         		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-        			flag=1;
+        			shieldFlag=1;
  	    			shield.generatenewtoken(root);
  	    });
         timeline.getKeyFrames().add(shieldtime);
         KeyFrame magnettime = 
        		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-       			 	flag=1;
+       			 	magnetFlag=1;
 	    			magnet.generatenewtoken(root);
 	    });
         timeline.getKeyFrames().add(magnettime);
         KeyFrame balltime = 
       		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-      			 	flag=1;
+      			 	ballFlag=1;
 	    			ball.generatenewtoken(root);
 	    });
         timeline.getKeyFrames().add(balltime);
         KeyFrame destroytime = 
      		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-     			 	flag=1;
+     			 	destroyFlag=1;
 	    			destroy.generatenewtoken(root);
 	    });
         timeline.getKeyFrames().add(destroytime);
         KeyFrame cointime = 
      		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-     			 	flag=1;
+     			 	coinFlag=1;
 	    			coin.generatenewtoken(root);
 	    });
         timeline.getKeyFrames().add(cointime);
@@ -233,7 +234,10 @@ public class snakeygamey extends Application {
 				//remove tail circles and remove from root
 				root.getChildren().remove(snake.getTrail().getTailtrail().get(i-1));
 				snake.getTrail().getTailtrail().get(i-1).setVisible(false);
-				
+				snake.setLength(snake.getLength()-1);
+//				System.out.println(snake.getLength());
+//				
+//				System.out.println(".."+snake.getTrail().getTailtrail().size());
 				//update Group snakeBody
 				snake.getTrail().getSnakeBody().getChildren().remove(snake.getTrail().getTailtrail().get(i-1));
 			}
@@ -241,17 +245,27 @@ public class snakeygamey extends Application {
 	}
 
 	private void checkState() {
-		Node snakeHead=snake.getTrail().getTailtrail().get(0);
+		Node snakeHead=null;
+		if(snake.getLength()!=0) {
+			snakeHead=snake.getTrail().getTailtrail().get(0);
+		}
+		else {
+			gameOver();
+		}
+		
 		for (Block r: row) {
 			Node blk=r.getR();
+			if(snakeHead!=null)
 			if (blk.getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && blockFlag==1) {
+				collidingFlag=1;
 				if(snake.getLength()>=r.getValue()) {
 //					root.getChildren().remove(blk);
-					blk.setVisible(false);
-					r.getTextValue().setVisible(false);
-					snake.setLength(snake.getLength()-r.getValue());
+//					snake.setLength(snake.getLength()-r.getValue());
 
-					if(snake.getLength()==0) gameOver();
+					if(snake.getLength()==0) {
+						gameOver();
+					}
+					
 					else {
 						/*decreasing snake length(variable), updating Group snakeBody, removing tail circles of snake
 						 and text on screen */
@@ -261,57 +275,80 @@ public class snakeygamey extends Application {
 							timeline.pause();
 							blockTimeline.pause();
 							wallTimeline.pause();
-	
+							
 							PauseTransition pause = new PauseTransition(Duration.millis(100*r.getValue()));
 							pause.setOnFinished(event -> {
 								timer.start();
 								timeline.play();
 								blockTimeline.play();
 								wallTimeline.play();
+								blk.setVisible(false);
+								collidingFlag=0;
+								r.getTextValue().setVisible(false);
+								
+		
 							});
 //						Duration.millis(100);
 //							mouseHandler.wait(Duration.millis(100*r.getValue());
 							pause.play();
-
-							updateLength(-1,r.getValue());
 						}
+						
+						else {
+							blk.setVisible(false);
+							collidingFlag=0;
+							r.getTextValue().setVisible(false);
+						}
+						updateLength(-1,r.getValue());
 					}
+					
 				}
-				else gameOver();
+				else {
+					gameOver();
+				}
 
 				blockFlag=0;
 			}
 		}
 
-		if(destroy.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && flag==1) {
+		if(destroy.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && destroyFlag==1) {
+			collidingFlag=1;
 //			destroy.getC().setTranslateY(destroy.getC().getTranslateY()+200);
 			root.getChildren().removeAll(destroy.getC(), destroy.getImageView());
 			for(int i=0;i<row.size();i++) {
 				root.getChildren().remove(row.get(i).getR());
 //				row.remove(i);
 			}
-			flag=0;
+			destroyFlag=0;
+			collidingFlag=0;
 		}
 
-		if(ball.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && flag==1) {
+		if(ball.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && ballFlag==1) {
+			collidingFlag=1;
 			root.getChildren().removeAll(ball.imageView,ball.c);
 			updateLength(1,0);
-			flag=0;
+			ballFlag=0;
+			collidingFlag=0;
 		}
 
-		if(coin.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && flag==1) {
+		if(coin.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && coinFlag==1) {
+			collidingFlag=1;
 			root.getChildren().removeAll(coin.getC(),coin.getImageView());
-			flag=0;
+			coinFlag=0;
+			collidingFlag=0;
 		}
 
-		if(magnet.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && flag==1) {
+		if(magnet.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && magnetFlag==1) {
+			collidingFlag=1;
 			root.getChildren().removeAll(magnet.getC(),magnet.getImageView());			
-			flag=0;
+			magnetFlag=0;
+			collidingFlag=0;
 		}
 
-		if(shield.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && flag==1) {
+		if(shield.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && shieldFlag==1) {
+			collidingFlag=1;
 			root.getChildren().removeAll(shield.getC(), shield.getImageView());
-			flag=0;
+			shieldFlag=0;
+			collidingFlag=0;
 		}
 	}
 
@@ -360,7 +397,6 @@ public class snakeygamey extends Application {
 			try {
 				stage.setScene(new Scene(createContent()));
 			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 	        stage.getScene().setOnKeyPressed(event -> {
@@ -417,12 +453,14 @@ public class snakeygamey extends Application {
 	EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
 		 @Override
 	        public void handle(MouseEvent mouseEvent) {
+			 if(collidingFlag==0) {
 			 TranslateTransition t= new TranslateTransition();
 	        	t.setDuration(Duration.millis(1));
 	        	t.setToX(mouseEvent.getX()-180);
 	        	t.setToY(snake.getTranslateY());
 	        	t.setNode(snake.getTrail().getTailtrail().get(0));
 	        	t.play();
+			 }
 	        }
 	};
 

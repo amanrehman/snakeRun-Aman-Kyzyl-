@@ -47,7 +47,7 @@ public class Snake {
 	}
 
 	public Snake(Pane root) {
-		length=8;
+		length=30;
 //		hiddenLength=92;
 		snakelength=new Text(Integer.toString(length));
 		snakelength.setFill(Color.WHITE);
