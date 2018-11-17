@@ -1,6 +1,7 @@
 import javafx.animation.TranslateTransition;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 public class Snake {
@@ -44,6 +45,7 @@ public class Snake {
 //		hiddenLength=92;
 		snakelength=new Text(Integer.toString(length));
 		snakelength.setFill(Color.WHITE);
+		snakelength.setFont(Font.font ("Verdana", 15));
 		trail=new Trail(root,length,180,360,snakelength);
 	}
 

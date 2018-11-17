@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 public class Ball extends Token{	
 	private int value;
@@ -30,6 +31,7 @@ public class Ball extends Token{
 		valueText=new Text(Integer.toString(0));
 		value=generatenevalue();
 		valueText.setFill(Color.BLACK);
+		valueText.setFont(Font.font ("Verdana", 15));
     	setImage( new Image(new FileInputStream(".\\ball.png")));
     	setImageView(new ImageView(getImage()));
     	setC(new Circle(15,15,15,Color.rgb(0, 0, 0, 0)));

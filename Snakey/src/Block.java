@@ -1,6 +1,7 @@
 import java.util.Random;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class Block extends Rectangle{
@@ -14,6 +15,7 @@ public class Block extends Rectangle{
 		r.setArcWidth(30.0); 
 		r.setArcHeight(20.0);
 		textValue=new Text("1");
+		textValue.setFont(Font.font ("Verdana", 20));
 		value = 1;
 		positionX=-1;
 	}

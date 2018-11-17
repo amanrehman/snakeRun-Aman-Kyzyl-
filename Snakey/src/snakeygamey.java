@@ -46,8 +46,8 @@ public class snakeygamey extends Application {
 	private int wallFlag;
 	private int shieldPower;
 	private int collidingFlag;
-	private int score;
-	private Text scoreText;
+	private int score,coinScore;
+	private Text scoreText,coinScoreText;
 	private static final int tokenDuration=10;
 	
 	private Parent createContent() throws FileNotFoundException {
@@ -71,9 +71,18 @@ public class snakeygamey extends Application {
 		score=0;
 		scoreText=new Text(Integer.toString(score));
 		scoreText.setFill(Color.WHITE);
+		scoreText.setFont(Font.font ("Verdana", 15));
 		scoreText.setX(320);
 		scoreText.setY(40);
-		root.getChildren().add(scoreText);
+		
+		coinScore=0;
+		coinScoreText=new Text(Integer.toString(coinScore));
+		coinScoreText.setFill(Color.GOLD);
+		coinScoreText.setFont(Font.font ("Verdana", 15));
+		coinScoreText.setX(260);
+		coinScoreText.setY(40);
+		
+		root.getChildren().addAll(scoreText,coinScoreText);
 		Button pauseButton=new Button("||");
 		root.getChildren().add(pauseButton);
 		
@@ -224,7 +233,7 @@ public class snakeygamey extends Application {
 			val.setX(rect.getX()+36);
 			val.setY(36);
 			val.setFill(Color.BLACK);
-
+			val.setFont(Font.font ("Verdana", 15));
 			rectStack.getChildren().addAll(rect);
 			textStack.getChildren().addAll(val);
 		}
@@ -401,6 +410,8 @@ public class snakeygamey extends Application {
 		if(coin.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && coinFlag==1) {
 			collidingFlag=1;
 			root.getChildren().removeAll(coin.getC(),coin.getImageView());
+			coinScore=coinScore+1;
+			coinScoreText.setText(Integer.toString(coinScore));
 			coinFlag=0;
 			collidingFlag=0;
 		}
