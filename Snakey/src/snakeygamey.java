@@ -46,6 +46,8 @@ public class snakeygamey extends Application {
 	private int wallFlag;
 	private int shieldPower;
 	private int collidingFlag;
+	private int score;
+	private Text scoreText;
 	private static final int tokenDuration=10;
 	
 	private Parent createContent() throws FileNotFoundException {
@@ -66,6 +68,12 @@ public class snakeygamey extends Application {
 		collidingFlag=0;
 		shieldPower=0;
 		wallFlag=0;
+		score=0;
+		scoreText=new Text(Integer.toString(score));
+		scoreText.setFill(Color.WHITE);
+		scoreText.setX(320);
+		scoreText.setY(40);
+		root.getChildren().add(scoreText);
 		Button pauseButton=new Button("||");
 		root.getChildren().add(pauseButton);
 		
@@ -133,7 +141,7 @@ public class snakeygamey extends Application {
         timeline.play();
 
         blockTimeline = new Timeline(
-        	    new KeyFrame(Duration.seconds(0
+        	    new KeyFrame(Duration.seconds(2.5
         	    		), e -> {
         	        ChainGenerator();
         	    })
@@ -241,7 +249,8 @@ public class snakeygamey extends Application {
 					//root.getChildren().remove(snake.getTrail().getTailtrail().get(i-1));
 					snake.getTrail().getTailtrail().get(i-1).setVisible(false);
 					snake.setLength(snake.getLength()-1);
-
+					score=score+1;
+					scoreText.setText(Integer.toString(score));
 				}
 			}
 			else {
@@ -250,8 +259,10 @@ public class snakeygamey extends Application {
 				pause.setOnFinished(event -> {
 					if(snake.getLength()>0) {
 						snake.getTrail().getTailtrail().get(snake.getLength()-1).setVisible(false);
+						score=score+1;
 						snake.setLength(snake.getLength()-1);
 						snake.updatemovement(root);
+						scoreText.setText(Integer.toString(score));
 					}
 					else {
 						gameOver();
