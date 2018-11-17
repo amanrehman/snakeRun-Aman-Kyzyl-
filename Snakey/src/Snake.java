@@ -71,20 +71,21 @@ public class Snake {
 	}
 
 	public void updatemovement(Pane root) {
-		if(!snakelength.getText().equals(Integer.toString(length))) {
-			root.getChildren().remove(snakelength);
-			snakelength=new Text(Integer.toString(length));
-			snakelength.setFill(Color.WHITE);
-			snakelength.setX(180);
-			snakelength.setY(340);
-//			System.out.println(trail.getTailtrail().get(0).getTranslateY()-20);
-			root.getChildren().add(snakelength);
-		}
+//		if(!snakelength.getText().equals(Integer.toString(length))) {
+//			root.getChildren().remove(snakelength);
+//			snakelength=new Text(Integer.toString(length));
+//			snakelength.setFill(Color.WHITE);
+//			snakelength.setX(180);
+//			snakelength.setY(340);
+////			System.out.println(trail.getTailtrail().get(0).getTranslateY()-20);
+//			root.getChildren().add(snakelength);
+//		}
+		snakelength.setText(Integer.toString(length));
 
 		if(trail.getTailtrail().size()!=0) snakelength.setX(trail.getTailtrail().get(0).getTranslateX()+175);
 		else snakelength=new Text("1");
 
-		for(int i=1;i<length;i++) {
+		for(int i=1;i<100;i++) {
 			TranslateTransition t= new TranslateTransition();
         	t.setDuration(Duration.millis(35));
         	t.setToX(trail.getTailtrail().get(i-1).getTranslateX());

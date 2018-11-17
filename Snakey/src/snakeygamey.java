@@ -228,18 +228,33 @@ public class snakeygamey extends Application {
 
 	private void updateLength(int flag, int blockValue) {
 		if(flag==-1) {
-			int prevSizeOfSnake=snake.getTrail().getTailtrail().size();
+			if(blockValue<=5 && snake.getLength()>blockValue+1)
+			{
+				for(int i=snake.getLength(),j=0;j<blockValue;i--,j++) {
+					//remove tail circles and remove from root
+					//root.getChildren().remove(snake.getTrail().getTailtrail().get(i-1));
+					snake.getTrail().getTailtrail().get(i-1).setVisible(false);
+					snake.setLength(snake.getLength()-1);
 
-			for(int i=prevSizeOfSnake,j=0;j<blockValue;i--,j++) {
-				//remove tail circles and remove from root
-				root.getChildren().remove(snake.getTrail().getTailtrail().get(i-1));
-				snake.getTrail().getTailtrail().get(i-1).setVisible(false);
-				snake.setLength(snake.getLength()-1);
-//				System.out.println(snake.getLength());
-//				
-//				System.out.println(".."+snake.getTrail().getTailtrail().size());
-				//update Group snakeBody
-				snake.getTrail().getSnakeBody().getChildren().remove(snake.getTrail().getTailtrail().get(i-1));
+				}
+			}
+			else {
+			
+				PauseTransition pause = new PauseTransition(Duration.millis(100));
+				pause.setOnFinished(event -> {
+					if(snake.getLength()>0) {
+						snake.getTrail().getTailtrail().get(snake.getLength()-1).setVisible(false);
+						snake.setLength(snake.getLength()-1);
+						snake.updatemovement(root);
+					}
+					else {
+						gameOver();
+					}
+				});
+	//			pause.play();
+				SequentialTransition seq = new SequentialTransition(pause);
+				seq.setCycleCount(blockValue);
+				seq.play();
 			}
 		}
 	}
@@ -248,17 +263,13 @@ public class snakeygamey extends Application {
 		Node snakeHead=null;
 		if(snake.getLength()!=0) {
 			snakeHead=snake.getTrail().getTailtrail().get(0);
-		}
-		else {
-			gameOver();
-		}
 		
 		for (Block r: row) {
 			Node blk=r.getR();
 			if(snakeHead!=null)
 			if (blk.getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && blockFlag==1) {
 				collidingFlag=1;
-				if(snake.getLength()>=r.getValue()) {
+//				if(snake.getLength()>=r.getValue()) {
 //					root.getChildren().remove(blk);
 //					snake.setLength(snake.getLength()-r.getValue());
 
@@ -270,27 +281,48 @@ public class snakeygamey extends Application {
 						/*decreasing snake length(variable), updating Group snakeBody, removing tail circles of snake
 						 and text on screen */
 
-						if(r.getValue()>5) {
+						if(r.getValue()>5 || snake.getLength()<=r.getValue()) {
 							timer.stop();
 							timeline.pause();
 							blockTimeline.pause();
 							wallTimeline.pause();
 							
-							PauseTransition pause = new PauseTransition(Duration.millis(100*r.getValue()));
-							pause.setOnFinished(event -> {
-								timer.start();
-								timeline.play();
-								blockTimeline.play();
-								wallTimeline.play();
-								blk.setVisible(false);
-								collidingFlag=0;
-								r.getTextValue().setVisible(false);
+//							for(int i=r.getValue();i>0;i--) {
+//								r.getTextValue().setVisible(false);
 								
-		
-							});
-//						Duration.millis(100);
-//							mouseHandler.wait(Duration.millis(100*r.getValue());
-							pause.play();
+								PauseTransition pause = new PauseTransition(Duration.millis(100));
+								pause.setOnFinished(event -> {
+									if(snake.getLength()>0) {
+										r.setValue(r.getValue()-1);
+										r.getTextValue().setText(Integer.toString(r.getValue()));
+										if(r.getValue()==0) {
+											timer.start();
+											timeline.play();
+											blockTimeline.play();
+											wallTimeline.play();
+											blk.setVisible(false);
+											collidingFlag=0;
+											r.getTextValue().setVisible(false);
+										}
+									}
+								});
+//								pause.play();
+								SequentialTransition seq = new SequentialTransition(pause);
+								if(snake.getLength()>r.getValue())
+									seq.setCycleCount(r.getValue());
+								else
+									seq.setCycleCount(snake.getLength());
+								seq.play();
+
+//							r.getTextValue().setVisible(true);
+//							}
+//							PauseTransition pause = new PauseTransition(Duration.millis(100*r.getValue()));
+//							pause.setOnFinished(event -> {
+								
+								
+//						
+//							});
+//							pause.play();
 						}
 						
 						else {
@@ -301,10 +333,11 @@ public class snakeygamey extends Application {
 						updateLength(-1,r.getValue());
 					}
 					
-				}
-				else {
-					gameOver();
-				}
+//				}
+//				else {
+//					updateLength(-1, r.getValue());
+////					gameOver();
+//				}
 
 				blockFlag=0;
 			}
@@ -349,6 +382,11 @@ public class snakeygamey extends Application {
 			root.getChildren().removeAll(shield.getC(), shield.getImageView());
 			shieldFlag=0;
 			collidingFlag=0;
+		}
+		
+		}
+		else {
+			gameOver();
 		}
 	}
 

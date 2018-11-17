@@ -10,11 +10,13 @@ public class Trail{
 	private Group snakeBody;
 	private Group hiddenSnakeBody;
 	private int initialPosX, initialPosY;
+	private int actualLength;
 
 	public Trail(Pane root,int length, int initialPosX, int initialPosY,Text snakelength) {
 		snakeBody = new Group();
 		hiddenSnakeBody=new Group();
 //		addToHiddenSnakeBody();
+		actualLength=100;
 		this.initialPosX=initialPosX;
 		this.initialPosY=initialPosY;
 		snakelength.setX(initialPosX);
@@ -48,6 +50,10 @@ public class Trail{
 		tailtrail = snakeBody.getChildren();
 		for(int i=0;i<length;i++) {
 			tailtrail.add(new Circle(initialPosX,initialPosY+(i*20),10,Color.WHITESMOKE));
+		}
+		for(int i=length;i<actualLength;i++) {
+			tailtrail.add(new Circle(initialPosX,initialPosY+(i*20),10,Color.WHITESMOKE));
+			tailtrail.get(i).setVisible(false);
 		}
 //		root.getChildren().addAll(snakeBody);
 	}
