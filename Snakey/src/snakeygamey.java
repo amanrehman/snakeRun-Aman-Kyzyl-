@@ -43,6 +43,7 @@ public class snakeygamey extends Application {
 	private Coin coin;
 	private int blockFlag;
 	private int ballFlag,shieldFlag,magnetFlag,destroyFlag,coinFlag;
+	private int wallFlag;
 	private int shieldPower;
 	private int collidingFlag;
 	private static final int tokenDuration=10;
@@ -64,6 +65,7 @@ public class snakeygamey extends Application {
 		blockFlag=0;
 		collidingFlag=0;
 		shieldPower=0;
+		wallFlag=0;
 		Button pauseButton=new Button("||");
 		root.getChildren().add(pauseButton);
 		
@@ -85,6 +87,7 @@ public class snakeygamey extends Application {
             	shield.updatemovement(root,speed);
             	magnet.updatemovement(root,speed);
             	ball.updatemovement(root,speed);
+            	ball.updatemovementText(root,ball.getPositionX(),ball.getPositionY());
             	destroy.updatemovement(root,speed);
             	coin.updatemovement(root,speed);
             	wall.updatemovent(root,speed);
@@ -111,6 +114,8 @@ public class snakeygamey extends Application {
       		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
       			 	ballFlag=1;
 	    			ball.generatenewtoken(root);
+	    			ball.setValue(ball.generatenevalue());
+	    			ball.generatenewvaluetext(root,ball.getPositionX(),ball.getPositionY());
 	    });
         timeline.getKeyFrames().add(balltime);
         KeyFrame destroytime = 
@@ -128,7 +133,7 @@ public class snakeygamey extends Application {
         timeline.play();
 
         blockTimeline = new Timeline(
-        	    new KeyFrame(Duration.seconds(2.5
+        	    new KeyFrame(Duration.seconds(0
         	    		), e -> {
         	        ChainGenerator();
         	    })
@@ -226,8 +231,9 @@ public class snakeygamey extends Application {
 		checkState();
     }
 
-	private void updateLength(int flag, int blockValue) {
+	private void updateLength(int flag, int value) {
 		if(flag==-1) {
+			int blockValue=value;
 			if(blockValue<=5 && snake.getLength()>blockValue+1)
 			{
 				for(int i=snake.getLength(),j=0;j<blockValue;i--,j++) {
@@ -256,6 +262,24 @@ public class snakeygamey extends Application {
 				seq.setCycleCount(blockValue);
 				seq.play();
 			}
+		}
+		else if(flag==1){
+			int ballValue=value;
+			int prevLen=snake.getLength();
+//			for(int i=prevLen;i<prevLen+ballValue;i++) {
+//				snake.getTrail().getTailtrail().get(i-1).setVisible(true);
+//				snake.setLength(snake.getLength()+1);
+//			}
+			
+			PauseTransition pause = new PauseTransition(Duration.millis(100));
+			pause.setOnFinished(event -> {
+				snake.getTrail().getTailtrail().get(snake.getLength()).setVisible(true);
+				snake.setLength(snake.getLength()+1);
+			});
+//			pause.play();
+			SequentialTransition seq = new SequentialTransition(pause);
+			seq.setCycleCount(ballValue);
+			seq.play();
 		}
 	}
 
@@ -357,8 +381,8 @@ public class snakeygamey extends Application {
 
 		if(ball.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && ballFlag==1) {
 			collidingFlag=1;
-			root.getChildren().removeAll(ball.imageView,ball.c);
-			updateLength(1,0);
+			root.getChildren().removeAll(ball.getImageView(),ball.getC(),ball.getValueText());
+			updateLength(1,ball.getValue());
 			ballFlag=0;
 			collidingFlag=0;
 		}
@@ -383,7 +407,16 @@ public class snakeygamey extends Application {
 			shieldFlag=0;
 			collidingFlag=0;
 		}
-		
+		if(wall.getRec().getBoundsInParent().intersects(snakeHead.getBoundsInParent())){
+			if(wall.getRec().getX()-180>snake.getTranslateX()) {
+				wallFlag=-1;
+				System.out.println("stay left");
+			}
+			else {
+				wallFlag=1;
+				System.out.println("stay right");
+			}
+		}
 		}
 		else {
 			gameOver();
@@ -492,12 +525,57 @@ public class snakeygamey extends Application {
 		 @Override
 	        public void handle(MouseEvent mouseEvent) {
 			 if(collidingFlag==0) {
-			 TranslateTransition t= new TranslateTransition();
-	        	t.setDuration(Duration.millis(1));
-	        	t.setToX(mouseEvent.getX()-180);
-	        	t.setToY(snake.getTranslateY());
-	        	t.setNode(snake.getTrail().getTailtrail().get(0));
-	        	t.play();
+				 if(wallFlag==1) {
+					 TranslateTransition t= new TranslateTransition();
+			        	t.setDuration(Duration.millis(1));
+			        	if(mouseEvent.getX()-180>wall.getRec().getX()-180)
+			        		t.setToX(mouseEvent.getX()-180);
+			        	else
+			        		t.setToX(t.getToX());
+			        	t.setToY(snake.getTranslateY());
+			        	t.setNode(snake.getTrail().getTailtrail().get(0));
+			        	t.play();
+			        	
+			        	if(wall.getRec().getTranslateY()>=320) {
+			        		wallFlag=0;
+			        	}
+				 }
+				 else if(wallFlag==-1) {
+					 TranslateTransition t= new TranslateTransition();
+			        	t.setDuration(Duration.millis(1));
+			        	if(mouseEvent.getX()-180<wall.getRec().getX()-180)
+			        		t.setToX(mouseEvent.getX()-180);
+			        	else
+			        		t.setToX(t.getToX());
+			        	t.setToY(snake.getTranslateY());
+			        	t.setNode(snake.getTrail().getTailtrail().get(0));
+			        	t.play();
+			        	
+			        	if(wall.getRec().getTranslateY()>=320) {
+			        		wallFlag=0;
+			        	}
+				 }
+				 else {
+					 TranslateTransition t= new TranslateTransition();
+			        	t.setDuration(Duration.millis(1));
+			        	double nextX=mouseEvent.getX()-180;
+//			        	System.out.println(nextX+" "+(wall.getRec().getX()-180)+" "+snake.getTranslateX());
+//			        	if(nextX>wall.getRec().getX()-180 && wall.getRec().getX()-180>snake.getTranslateX())
+//			        	{
+//			        		System.out.println("lolol");
+//			        		t.setToX(wall.getRec().getX()-180);
+//			        	}
+//			        	else if(nextX<(wall.getRec().getX()-180) && (wall.getRec().getX()-180)<snake.getTranslateX())
+//			        	{
+//			        		t.setToX(wall.getRec().getX()-180);
+//			        		System.out.println("lolol");
+//			        	}
+//			        	else
+			        		t.setToX(nextX);
+			        	t.setToY(snake.getTranslateY());
+			        	t.setNode(snake.getTrail().getTailtrail().get(0));
+			        	t.play();
+				 }
 			 }
 	        }
 	};

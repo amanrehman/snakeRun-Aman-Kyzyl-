@@ -5,7 +5,6 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 public class Snake {
 	private int length;
-	static int hiddenLength=92;
 	private Trail trail;
 	private int speed;
 	private Text snakelength;
@@ -15,12 +14,6 @@ public class Snake {
 	}
 	public void setLength(int length) {
 		this.length = length;
-	}
-	public int getHiddenLength() {
-		return hiddenLength;
-	}
-	public void setHiddenLength(int hiddenLength) {
-		this.hiddenLength = hiddenLength;
 	}
 	public Trail getTrail() {
 		return trail;
@@ -47,7 +40,7 @@ public class Snake {
 	}
 
 	public Snake(Pane root) {
-		length=30;
+		length=4;
 //		hiddenLength=92;
 		snakelength=new Text(Integer.toString(length));
 		snakelength.setFill(Color.WHITE);

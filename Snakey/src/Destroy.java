@@ -12,8 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 public class Destroy extends Token{	
     Destroy() throws FileNotFoundException{
-    	image= new Image(new FileInputStream(".\\hammer.png"));
-    	imageView = new ImageView(image);
-    	c=new Circle(0,0,20,Color.rgb(0, 0, 0, 0));
+    	setImage(new Image(new FileInputStream(".\\hammer.png")));
+    	setImageView(new ImageView(getImage()));
+    	setC(new Circle(15,15,15,Color.rgb(0, 0, 0, 0)));
     }
 }

@@ -7,10 +7,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView; 
 
 abstract class Token {
-	Image image;
-	Group img;
-	ImageView imageView;
-	Circle c;
+	private Image image;
+	private Group img;
+	private ImageView imageView;
+	private Circle c;
 	
 	private int positionX;
 	private int positionY;
@@ -76,8 +76,8 @@ abstract class Token {
 		Random r=new Random();
     	this.positionX=(r.nextInt(320)+20);
     	this.positionY=0;
-    	imageView.setX(r.nextInt(320)+20); 
-        imageView.setY(0);
+    	imageView.setX(positionX); 
+        imageView.setY(positionY);
         c.setTranslateX(imageView.getX()-165);
         c.setTranslateY(imageView.getY()+10);
         root.getChildren().addAll(imageView,c);

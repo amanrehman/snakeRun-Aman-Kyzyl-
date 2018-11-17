@@ -12,8 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 public class Magnet extends Token{	
     Magnet() throws FileNotFoundException{
-    	image= new Image(new FileInputStream(".\\magnet.png"));
-    	imageView = new ImageView(image);
-    	c=new Circle(0,0,20,Color.rgb(0, 0, 0, 0));
+    	setImage(new Image(new FileInputStream(".\\magnet.png")));
+    	setImageView(new ImageView(getImage()));
+    	setC(new Circle(15,15,15,Color.rgb(0, 0, 0, 0)));
     }
 }

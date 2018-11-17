@@ -25,7 +25,7 @@ public class Coin{
     Coin() throws FileNotFoundException{
     	image = new Image(new FileInputStream(".\\coin.png"));
     	imageView = new ImageView(image);
-    	c = new Circle(0,0,20,Color.rgb(0, 0, 0, 0));
+    	c = new Circle(15,15,15,Color.rgb(0, 0, 0, 0));
     }
     
    
