@@ -297,6 +297,61 @@ public class snakeygamey extends Application {
 		}
 	}
 
+	private void burstAnimation() {
+		//burst animation
+		Node[] n=new Node[20];
+		for(int i=1;i<8;i++) {
+		Circle c1=new Circle(snake.getTranslateX()+175,350, 7, Color.WHITE);
+		System.out.println(snake.getTranslateX()+175);
+		root.getChildren().add(c1);
+		n[i]=c1;
+		TranslateTransition t= new TranslateTransition();
+		ScaleTransition s=new ScaleTransition(Duration.millis(200), c1);
+	    s.setByX(-1);
+	    s.setByY(-1);
+    	t.setDuration(Duration.millis(200));
+    	switch (i) {
+		case 1:
+			t.setToX(0);
+    		t.setToY(-100);
+			break;
+		case 2:
+			t.setToX(50);
+    		t.setToY(-50);
+			break;
+		case 3:
+			t.setToX(100);
+    		t.setToY(0);
+			break;
+		case 4:
+			t.setToX(50);
+    		t.setToY(50);
+			break;
+		case 5:
+			t.setToX(0);
+    		t.setToY(100);
+			break;
+		case 6:
+			t.setToX(-50);
+    		t.setToY(-50);
+			break;
+		case 7:
+			t.setToX(-100);
+    		t.setToY(0);
+			break;
+		case 8:
+			t.setToX(-50);
+    		t.setToY(50);
+			break;
+		default:
+			break;
+		}
+    	t.setNode(c1);
+    	t.play();
+    	s.play();
+		}
+	}
+	
 	private void checkState() {
 		Node snakeHead=null;
 		if(snake.getLength()!=0) {
@@ -332,6 +387,7 @@ public class snakeygamey extends Application {
 								pause.setOnFinished(event -> {
 									if(snake.getLength()>0) {
 										r.setValue(r.getValue()-1);
+										burstAnimation();
 										r.getTextValue().setText(Integer.toString(r.getValue()));
 										if(r.getValue()==0) {
 											timer.start();
@@ -367,6 +423,7 @@ public class snakeygamey extends Application {
 							blk.setVisible(false);
 							collidingFlag=0;
 							r.getTextValue().setVisible(false);
+							burstAnimation();
 						}
 						updateLength(-1,r.getValue());
 					}
@@ -389,6 +446,7 @@ public class snakeygamey extends Application {
 				root.getChildren().remove(row.get(i).getR());
 //				row.remove(i);
 			}
+			burstAnimation();
 			destroyFlag=0;
 			collidingFlag=0;
 		}
@@ -397,6 +455,7 @@ public class snakeygamey extends Application {
 			collidingFlag=1;
 			root.getChildren().removeAll(ball.getImageView(),ball.getC(),ball.getValueText());
 			updateLength(1,ball.getValue());
+			burstAnimation();
 			ballFlag=0;
 			collidingFlag=0;
 		}
@@ -406,6 +465,7 @@ public class snakeygamey extends Application {
 			root.getChildren().removeAll(coin.getC(),coin.getImageView());
 			coinScore=coinScore+1;
 			coinScoreText.setText(Integer.toString(coinScore));
+			burstAnimation();
 			coinFlag=0;
 			collidingFlag=0;
 		}
@@ -413,6 +473,7 @@ public class snakeygamey extends Application {
 		if(magnet.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && magnetFlag==1) {
 			collidingFlag=1;
 			root.getChildren().removeAll(magnet.getC(),magnet.getImageView());			
+			burstAnimation();
 			magnetFlag=0;
 			collidingFlag=0;
 		}
@@ -420,6 +481,7 @@ public class snakeygamey extends Application {
 		if(shield.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && shieldFlag==1) {
 			collidingFlag=1;
 			root.getChildren().removeAll(shield.getC(), shield.getImageView());
+			burstAnimation();
 			shieldFlag=0;
 			collidingFlag=0;
 		}
@@ -471,15 +533,15 @@ public class snakeygamey extends Application {
 	private Group setDiffButtons(Stage stage){
 		Button easyButton=new Button("Easy");
 		easyButton.setLayoutX(140);
-		easyButton.setLayoutY(300);
+		easyButton.setLayoutY(260);
 
 		Button mediumButton=new Button("Medium");
 		mediumButton.setLayoutX(140);
-		mediumButton.setLayoutY(340);
+		mediumButton.setLayoutY(300);
 
 		Button hardButton=new Button("Hard");
 		hardButton.setLayoutX(140);
-		hardButton.setLayoutY(380);
+		hardButton.setLayoutY(340);
 
 		Group diffMenuButtons=new Group();
 		diffMenuButtons.getChildren().addAll(easyButton, mediumButton, hardButton);
