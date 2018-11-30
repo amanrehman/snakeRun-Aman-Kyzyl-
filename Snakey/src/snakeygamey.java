@@ -1,17 +1,12 @@
+import java.io.FileNotFoundException;
+import javafx.util.Duration;
+import java.util.ArrayList;
+import java.util.Random;
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import javafx.application.Application;
-
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Random;
-
-import javax.swing.plaf.basic.BasicTabbedPaneUI.MouseHandler;
-
 import javafx.scene.control.*;
-
 import javafx.animation.*;
-import javafx.util.Duration;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,7 +18,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
 import javafx.scene.Group;
-import javafx.scene.layout.*;
 
 public class snakeygamey extends Application {
 	private AnimationTimer timer;
@@ -34,7 +28,7 @@ public class snakeygamey extends Application {
 	private Timeline blockTimeline;
 	private Timeline wallTimeline;
     private Pane root;
-	private static final int speed=5;
+	private static int speed=4;
 	private Shield shield;
 	private Magnet magnet;
 	private Ball ball;
@@ -330,7 +324,7 @@ public class snakeygamey extends Application {
 							timeline.pause();
 							blockTimeline.pause();
 							wallTimeline.pause();
-							
+
 //							for(int i=r.getValue();i>0;i--) {
 //								r.getTextValue().setVisible(false);
 								
@@ -432,11 +426,11 @@ public class snakeygamey extends Application {
 		if(wall.getRec().getBoundsInParent().intersects(snakeHead.getBoundsInParent())){
 			if(wall.getRec().getX()-180>snake.getTranslateX()) {
 				wallFlag=-1;
-				System.out.println("stay left");
+//				System.out.println("stay left");
 			}
 			else {
 				wallFlag=1;
-				System.out.println("stay right");
+//				System.out.println("stay right");
 			}
 		}
 		}
@@ -468,7 +462,29 @@ public class snakeygamey extends Application {
             ft.setDelay(Duration.seconds(i * 0.15));
             ft.play();
         }
-		
+	}
+
+	private static void setSpeed(int s) {
+		speed=s;
+	}
+
+	private Group setDiffButtons(Stage stage){
+		Button easyButton=new Button("Easy");
+		easyButton.setLayoutX(140);
+		easyButton.setLayoutY(300);
+
+		Button mediumButton=new Button("Medium");
+		mediumButton.setLayoutX(140);
+		mediumButton.setLayoutY(340);
+
+		Button hardButton=new Button("Hard");
+		hardButton.setLayoutX(140);
+		hardButton.setLayoutY(380);
+
+		Group diffMenuButtons=new Group();
+		diffMenuButtons.getChildren().addAll(easyButton, mediumButton, hardButton);
+
+		return diffMenuButtons;
 	}
 
 	@Override
@@ -480,48 +496,86 @@ public class snakeygamey extends Application {
 		Button startButton=elements.createStartButton();
 		Button leadButton=elements.createLeadButton();
 
+		Group diffMenuButtons=setDiffButtons(stage);
+		Pane diffMenuPane=new Pane();
+		diffMenuPane.setStyle("-fx-background-color: black");
+		diffMenuPane.setPrefSize(360, 640);
+		
 		mainMenuPane.getChildren().addAll(startButton, leadButton);
 		Scene main=new Scene(mainMenuPane,360,640);
-
 		stage.setScene(main);
 		stage.show();
 
-		startButton.setOnAction(e -> {
-			try {
-				stage.setScene(new Scene(createContent()));
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			}
-	        stage.getScene().setOnKeyPressed(event -> {
-	            switch (event.getCode()) {
-	                case LEFT:
-	                	TranslateTransition t= new TranslateTransition();
-	                	t.setDuration(Duration.millis(25));
-	                	t.setToX(snake.getTranslateX()-5);
-	                	t.setToY(snake.getTranslateY());
-	                	t.setNode(snake.getTrail().getTailtrail().get(0));
-	                	t.play();
-	                	//snake.setTranslateX(snake.getTranslateX()-5);
-	            		//snake.updateleftmovement();
-	                	break;
-	                case RIGHT:
-	                	t= new TranslateTransition();
-	                	t.setDuration(Duration.millis(25));
-	                	t.setToX(snake.getTranslateX()+5);
-	                	t.setToY(snake.getTranslateY());
-	                	t.setNode(snake.getTrail().getTailtrail().get(0));
-	                	t.play();
-	                	
-	                	//snake.setTranslateX(snake.getTranslateX()+5);
-	            		//snake.updaterightmovement();
-	            		break;
-	                default:
-	                    break;
-	            }
-	        });
-	        stage.getScene().setOnMouseMoved(mouseHandler);
- 		});
-		
+		diffMenuPane.getChildren().add(diffMenuButtons);
+		Scene diffMenuScene=new Scene(diffMenuPane,360,640);
+
+		startButton.setOnAction(e -> {		
+			stage.setScene(diffMenuScene);
+
+			diffMenuButtons.getChildren().get(0).setOnMouseClicked(e1 -> {
+				setSpeed(4);
+				try {
+					stage.setScene(new Scene(createContent()));
+					stage.getScene().setOnMouseMoved(mouseHandler);
+				} catch (FileNotFoundException e4) {
+					e4.printStackTrace();
+				}
+//					System.out.println(speed);
+			});
+
+			diffMenuButtons.getChildren().get(1).setOnMouseClicked(e2 -> {
+				setSpeed(5);
+				try {
+					stage.setScene(new Scene(createContent()));
+					stage.getScene().setOnMouseMoved(mouseHandler);
+				} catch (FileNotFoundException e4) {
+					e4.printStackTrace();
+				}
+//					System.out.println(speed);
+			});
+
+			diffMenuButtons.getChildren().get(2).setOnMouseClicked(e3 -> {
+				setSpeed(6);
+				try {
+					stage.setScene(new Scene(createContent()));
+					stage.getScene().setOnMouseMoved(mouseHandler);
+				} catch (FileNotFoundException e4) {
+					e4.printStackTrace();
+				}
+//					System.out.println(speed);
+			});
+		});
+
+//		stage.getScene().setOnKeyPressed(event -> {
+//            switch (event.getCode()) {
+//                case LEFT:
+//                	TranslateTransition t= new TranslateTransition();
+//                	t.setDuration(Duration.millis(25));
+//                	t.setToX(snake.getTranslateX()-5);
+//                	t.setToY(snake.getTranslateY());
+//                	t.setNode(snake.getTrail().getTailtrail().get(0));
+//                	t.play();
+//                	//snake.setTranslateX(snake.getTranslateX()-5);
+//            		//snake.updateleftmovement();
+//                	break;
+//                case RIGHT:
+//                	t= new TranslateTransition();
+//                	t.setDuration(Duration.millis(25));
+//                	t.setToX(snake.getTranslateX()+5);
+//                	t.setToY(snake.getTranslateY());
+//                	t.setNode(snake.getTrail().getTailtrail().get(0));
+//                	t.play();
+//                	
+//                	//snake.setTranslateX(snake.getTranslateX()+5);
+//            		//snake.updaterightmovement();
+//            		break;
+//                default:
+//                    break;
+//            }
+//        });
+//        stage.getScene().setOnMouseMoved(mouseHandler);
+// 		});
+
 		leadButton.setOnAction(e ->{
 			Pane leadPane=new Pane();
 			
@@ -593,7 +647,7 @@ public class snakeygamey extends Application {
 //			        		System.out.println("lolol");
 //			        	}
 //			        	else
-			        		t.setToX(nextX);
+			        	t.setToX(nextX);
 			        	t.setToY(snake.getTranslateY());
 			        	t.setNode(snake.getTrail().getTailtrail().get(0));
 			        	t.play();
