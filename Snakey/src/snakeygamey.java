@@ -25,6 +25,7 @@ public class snakeygamey extends Application {
 	private Chain gen;
 	private ArrayList<Block> row=new ArrayList<Block>();
 	private Timeline timeline;
+	private Timeline coinTimeline;
 	private Timeline blockTimeline;
 	private Timeline wallTimeline;
     private Pane root;
@@ -135,14 +136,26 @@ public class snakeygamey extends Application {
 	    			destroy.generatenewtoken(root);
 	    });
         timeline.getKeyFrames().add(destroytime);
-        KeyFrame cointime = 
-     		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-     			 	coinFlag=1;
-	    			coin.generatenewtoken(root);
-	    });
-        timeline.getKeyFrames().add(cointime);
+//        KeyFrame cointime = 
+//     		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
+//     			 	coinFlag=1;
+//	    			coin.generatenewtoken(root);
+//	    });
+//        timeline.getKeyFrames().add(cointime);
         timeline.play();
 
+        
+        coinTimeline = new Timeline();
+        coinTimeline.setCycleCount(coinTimeline.INDEFINITE);
+        KeyFrame cointime = 
+        		 new KeyFrame(Duration.seconds(r.nextFloat()+2.5), e -> {
+        			 	coinFlag=1;
+   	    			coin.generatenewtoken(root);
+   	    });
+        coinTimeline.getKeyFrames().add(cointime);
+        coinTimeline.play();
+        
+        
         blockTimeline = new Timeline(
         	    new KeyFrame(Duration.seconds(2.5
         	    		), e -> {
@@ -169,6 +182,7 @@ public class snakeygamey extends Application {
 		timeline.pause();
 		blockTimeline.pause();
 		wallTimeline.pause();
+		coinTimeline.pause();
 
 		Pane pausePane=new Pane();
 		Button restartButton=new Button("Restart");
@@ -184,6 +198,7 @@ public class snakeygamey extends Application {
 			timeline.play();
 			blockTimeline.play();
 			wallTimeline.play();
+			coinTimeline.play();
 			currentStage.setScene(previousScene);
 		});
 	}
@@ -297,58 +312,65 @@ public class snakeygamey extends Application {
 		}
 	}
 
-	private void burstAnimation() {
+	private void burstAnimation(int initialX,int initialY,int color) {
+		//snake.getTranslateX()+175,350, 7, Color.WHITE
+		Random r= new Random();
 		//burst animation
 		Node[] n=new Node[20];
-		for(int i=1;i<8;i++) {
-		Circle c1=new Circle(snake.getTranslateX()+175,350, 7, Color.WHITE);
-		System.out.println(snake.getTranslateX()+175);
-		root.getChildren().add(c1);
-		n[i]=c1;
-		TranslateTransition t= new TranslateTransition();
-		ScaleTransition s=new ScaleTransition(Duration.millis(200), c1);
-	    s.setByX(-1);
-	    s.setByY(-1);
-    	t.setDuration(Duration.millis(200));
-    	switch (i) {
-		case 1:
-			t.setToX(0);
-    		t.setToY(-100);
-			break;
-		case 2:
-			t.setToX(50);
-    		t.setToY(-50);
-			break;
-		case 3:
-			t.setToX(100);
-    		t.setToY(0);
-			break;
-		case 4:
-			t.setToX(50);
-    		t.setToY(50);
-			break;
-		case 5:
-			t.setToX(0);
-    		t.setToY(100);
-			break;
-		case 6:
-			t.setToX(-50);
-    		t.setToY(-50);
-			break;
-		case 7:
-			t.setToX(-100);
-    		t.setToY(0);
-			break;
-		case 8:
-			t.setToX(-50);
-    		t.setToY(50);
-			break;
-		default:
-			break;
-		}
-    	t.setNode(c1);
-    	t.play();
-    	s.play();
+			for(int i=1;i<8;i++) {
+			Circle c1=new Circle();
+			if(color==1)
+				c1=new Circle(initialX,initialY, 7, Color.WHITE);
+			else
+				c1=new Circle(initialX,initialY,7,Color.YELLOW);
+			//System.out.println(snake.getTranslateX()+175);
+			root.getChildren().add(c1);
+			n[i]=c1;
+			TranslateTransition t= new TranslateTransition();
+			int sec=r.nextInt(2);
+			ScaleTransition s=new ScaleTransition(Duration.millis(200), c1);
+		    s.setByX(-1);
+		    s.setByY(-1);
+	    	t.setDuration(Duration.millis(200));
+	    	switch (i) {
+			case 1:
+				t.setToX(0);
+	    		t.setToY(-100);
+				break;
+			case 2:
+				t.setToX(50);
+	    		t.setToY(-50);
+				break;
+			case 3:
+				t.setToX(100);
+	    		t.setToY(0);
+				break;
+			case 4:
+				t.setToX(50);
+	    		t.setToY(50);
+				break;
+			case 5:
+				t.setToX(0);
+	    		t.setToY(100);
+				break;
+			case 6:
+				t.setToX(-50);
+	    		t.setToY(-50);
+				break;
+			case 7:
+				t.setToX(-100);
+	    		t.setToY(0);
+				break;
+			case 8:
+				t.setToX(-50);
+	    		t.setToY(50);
+				break;
+			default:
+				break;
+			}
+	    	t.setNode(c1);
+	    	t.play();
+	    	s.play();
 		}
 	}
 	
@@ -379,6 +401,7 @@ public class snakeygamey extends Application {
 							timeline.pause();
 							blockTimeline.pause();
 							wallTimeline.pause();
+							coinTimeline.pause();
 
 //							for(int i=r.getValue();i>0;i--) {
 //								r.getTextValue().setVisible(false);
@@ -387,13 +410,14 @@ public class snakeygamey extends Application {
 								pause.setOnFinished(event -> {
 									if(snake.getLength()>0) {
 										r.setValue(r.getValue()-1);
-										burstAnimation();
+										burstAnimation(snake.getTranslateX()+175,350,1);
 										r.getTextValue().setText(Integer.toString(r.getValue()));
 										if(r.getValue()==0) {
 											timer.start();
 											timeline.play();
 											blockTimeline.play();
 											wallTimeline.play();
+											coinTimeline.play();
 											blk.setVisible(false);
 											collidingFlag=0;
 											r.getTextValue().setVisible(false);
@@ -423,7 +447,7 @@ public class snakeygamey extends Application {
 							blk.setVisible(false);
 							collidingFlag=0;
 							r.getTextValue().setVisible(false);
-							burstAnimation();
+							burstAnimation(snake.getTranslateX()+175,350,1);
 						}
 						updateLength(-1,r.getValue());
 					}
@@ -446,7 +470,7 @@ public class snakeygamey extends Application {
 				root.getChildren().remove(row.get(i).getR());
 //				row.remove(i);
 			}
-			burstAnimation();
+			burstAnimation(snake.getTranslateX()+175,350,1);
 			destroyFlag=0;
 			collidingFlag=0;
 		}
@@ -455,7 +479,7 @@ public class snakeygamey extends Application {
 			collidingFlag=1;
 			root.getChildren().removeAll(ball.getImageView(),ball.getC(),ball.getValueText());
 			updateLength(1,ball.getValue());
-			burstAnimation();
+			burstAnimation(snake.getTranslateX()+175,350,1);
 			ballFlag=0;
 			collidingFlag=0;
 		}
@@ -465,15 +489,27 @@ public class snakeygamey extends Application {
 			root.getChildren().removeAll(coin.getC(),coin.getImageView());
 			coinScore=coinScore+1;
 			coinScoreText.setText(Integer.toString(coinScore));
-			burstAnimation();
+			burstAnimation(snake.getTranslateX()+175,350,1);
 			coinFlag=0;
 			collidingFlag=0;
 		}
 
 		if(magnet.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && magnetFlag==1) {
 			collidingFlag=1;
-			root.getChildren().removeAll(magnet.getC(),magnet.getImageView());			
-			burstAnimation();
+			root.getChildren().removeAll(magnet.getC(),magnet.getImageView());	
+			//root.getChildren().contains(getC);
+//			TranslateTransition t= new TranslateTransition();
+//        	t.setDuration(Duration.millis(1));
+//        	t.setToX(snake.getTranslateX()+175);
+//        	t.setToY(snake.getTranslateY());
+//        	t.setNode(coin.getImageView());
+//        	t.play();
+
+			root.getChildren().removeAll(coin.getC(),coin.getImageView());
+			coinScore=coinScore+1;
+			coinScoreText.setText(Integer.toString(coinScore));
+			burstAnimation((int)coin.getC().getTranslateX(),(int)coin.getC().getTranslateY(),2);
+			burstAnimation(snake.getTranslateX()+175,350,1);
 			magnetFlag=0;
 			collidingFlag=0;
 		}
@@ -481,7 +517,7 @@ public class snakeygamey extends Application {
 		if(shield.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && shieldFlag==1) {
 			collidingFlag=1;
 			root.getChildren().removeAll(shield.getC(), shield.getImageView());
-			burstAnimation();
+			burstAnimation(snake.getTranslateX()+175,350,1);
 			shieldFlag=0;
 			collidingFlag=0;
 		}
@@ -506,6 +542,7 @@ public class snakeygamey extends Application {
         timeline.stop();
         blockTimeline.stop();
         wallTimeline.stop();
+        coinTimeline.stop();
         String gameover = "G4m3 0v3R";
         HBox hBox = new HBox();
         hBox.setTranslateY(300);
