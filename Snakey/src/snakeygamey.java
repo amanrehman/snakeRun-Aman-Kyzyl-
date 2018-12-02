@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 
 import javafx.util.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
@@ -711,6 +713,7 @@ public class snakeygamey extends Application implements Serializable{
         magnetTimeline.stop();
         shieldTimeline.stop();
         destroyTimeline.stop();
+        addentry();
         String gameover = "G4m3 0v3R";
         HBox hBox = new HBox();
         hBox.setTranslateY(300);
@@ -985,6 +988,30 @@ public class snakeygamey extends Application implements Serializable{
 			}
 		}
 	}
+	private void addentry() {
+		 
+	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+	    Date date = new Date();
+	    String todaydate=formatter.format(date);
+
+	System.out.println("Adding entry to table..");
+	ObjectOutputStream out = null;
+	try {
+		out = new ObjectOutputStream(new FileOutputStream("ldbdb.txt",true));
+		out.writeObject(todaydate);
+		out.writeObject((Integer)(score));
+		out.flush();
+	} catch (Exception e) {
+		e.printStackTrace();
+		System.out.println(e.getMessage());
+	} finally {
+		try {
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}		
+}
 	public static void main(String[] args) {
         launch(args);
     }
