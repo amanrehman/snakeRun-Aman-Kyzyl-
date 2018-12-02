@@ -1,11 +1,14 @@
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+
+import java.io.Serializable;
+
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
-public class Trail{
+public class Trail implements Serializable{
 	private ObservableList<Node> tailtrail;
 	private Group snakeBody;
 	private Group hiddenSnakeBody;

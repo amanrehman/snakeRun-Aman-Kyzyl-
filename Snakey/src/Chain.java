@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Chain {
+public class Chain implements Serializable{
 	ArrayList<Block> row=new ArrayList<Block>();
 //	Block generator;
 	private ArrayList<Integer> positions=new ArrayList<Integer>();

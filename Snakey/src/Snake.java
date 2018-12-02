@@ -1,10 +1,12 @@
+import java.io.Serializable;
+
 import javafx.animation.TranslateTransition;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-public class Snake {
+public class Snake implements Serializable{
 	private int length;
 	private Trail trail;
 	private int speed;

@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -6,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-public class MainMenu {
+public class MainMenu implements Serializable{
 	private Pane layout= new Pane();
 
 	public Button createStartButton() {

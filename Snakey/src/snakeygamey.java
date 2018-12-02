@@ -1,7 +1,15 @@
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import javafx.util.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.Scanner;
+
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import javafx.application.Application;
@@ -19,14 +27,15 @@ import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
 import javafx.scene.Group;
 
-public class snakeygamey extends Application {
+public class snakeygamey extends Application implements Serializable{
 	private AnimationTimer timer;
-	private Snake snake;
+	private static Snake snake;
 	private Chain gen;
 	private ArrayList<Block> row=new ArrayList<Block>();
 	private Timeline timeline;
 	private Timeline coinTimeline;
 	private Timeline blockTimeline;
+	private Timeline mtimeline;
 	private Timeline wallTimeline;
     private Pane root;
 	private static int speed=4;
@@ -42,7 +51,10 @@ public class snakeygamey extends Application {
 	private int shieldPower;
 	private int collidingFlag;
 	private int score,coinScore;
-	private Text scoreText,coinScoreText;
+	private static Text scoreText;
+	private static Text magnetTimeText;
+	private int magnetSeconds;
+	private static Text coinScoreText;
 	private static final int tokenDuration=10;
 	
 	private Parent createContent() throws FileNotFoundException {
@@ -76,6 +88,13 @@ public class snakeygamey extends Application {
 		coinScoreText.setFont(Font.font ("Verdana", 15));
 		coinScoreText.setX(260);
 		coinScoreText.setY(40);
+		
+		magnetSeconds=25;
+		magnetTimeText=new Text(Integer.toString(magnetSeconds));
+		magnetTimeText.setFill(Color.WHITE);
+		magnetTimeText.setFont(Font.font ("Verdana", 15));
+		magnetTimeText.setX(200);
+		magnetTimeText.setY(40);
 		
 		root.getChildren().addAll(scoreText,coinScoreText);
 		Button pauseButton=new Button("||");
@@ -157,8 +176,7 @@ public class snakeygamey extends Application {
         
         
         blockTimeline = new Timeline(
-        	    new KeyFrame(Duration.seconds(2.5
-        	    		), e -> {
+        	    new KeyFrame(Duration.seconds(2.5), e -> {
         	        ChainGenerator();
         	    })
         	);
@@ -174,6 +192,26 @@ public class snakeygamey extends Application {
         wallTimeline.setCycleCount(Animation.INDEFINITE);
         wallTimeline.play();
         
+        
+        mtimeline = new Timeline(
+        	    new KeyFrame(Duration.seconds(0.5
+        	    		), e -> {
+        	    	magnetTimeText.setText(Integer.toString(magnetSeconds--));
+	      			if(root.getChildren().contains(coin.getImageView()))
+	    			{
+	    				root.getChildren().removeAll(coin.getC(),coin.getImageView());
+	    				coinScore=coinScore+1;
+	    				coinScoreText.setText(Integer.toString(coinScore));
+	    				burstAnimation((int)coin.getC().getTranslateX(),(int)coin.getC().getTranslateY(),2);
+	    				//burstAnimation(snake.getTranslateX()+175,350,1);
+	    			}
+	      			if(magnetSeconds==0) {
+	      				root.getChildren().remove(magnetTimeText);
+	      			}
+        	    })
+        	);
+        mtimeline.setCycleCount(26);
+
         return root;
     }
 	
@@ -486,10 +524,13 @@ public class snakeygamey extends Application {
 
 		if(coin.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && coinFlag==1) {
 			collidingFlag=1;
-			root.getChildren().removeAll(coin.getC(),coin.getImageView());
-			coinScore=coinScore+1;
-			coinScoreText.setText(Integer.toString(coinScore));
-			burstAnimation(snake.getTranslateX()+175,350,1);
+			if(root.getChildren().contains(coin.getImageView()))
+			{
+				root.getChildren().removeAll(coin.getC(),coin.getImageView());
+				coinScore=coinScore+1;
+				coinScoreText.setText(Integer.toString(coinScore));
+				burstAnimation(snake.getTranslateX()+175,350,1);
+			}
 			coinFlag=0;
 			collidingFlag=0;
 		}
@@ -504,12 +545,12 @@ public class snakeygamey extends Application {
 //        	t.setToY(snake.getTranslateY());
 //        	t.setNode(coin.getImageView());
 //        	t.play();
-
-			root.getChildren().removeAll(coin.getC(),coin.getImageView());
-			coinScore=coinScore+1;
-			coinScoreText.setText(Integer.toString(coinScore));
-			burstAnimation((int)coin.getC().getTranslateX(),(int)coin.getC().getTranslateY(),2);
-			burstAnimation(snake.getTranslateX()+175,350,1);
+			magnetSeconds=25;
+			if(root.getChildren().contains(magnetTimeText))
+				magnetSeconds=25;
+			else
+				root.getChildren().add(magnetTimeText);
+		    mtimeline.play();
 			magnetFlag=0;
 			collidingFlag=0;
 		}
@@ -754,7 +795,26 @@ public class snakeygamey extends Application {
 			 }
 	        }
 	};
-
+	public static void deserialise() {
+		System.out.println("Saving Game State...");
+		ObjectOutputStream out = null;
+		try {
+			out = new ObjectOutputStream(new FileOutputStream("db.txt"));
+			out.writeObject(snake.getLength());
+			out.writeObject(scoreText);
+			out.writeObject(coinScoreText);
+			out.flush();
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public static void main(String[] args) {
         launch(args);
     }

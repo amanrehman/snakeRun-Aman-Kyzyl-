@@ -1,7 +1,9 @@
+import java.io.Serializable;
+
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public class Leaderboard {
+public class Leaderboard implements Serializable{
 
 	public TableView createTable() {
 		TableView table = new TableView();

@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.Random;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
@@ -6,7 +7,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView; 
 
-abstract class Token {
+abstract class Token implements Serializable{
 	private Image image;
 	private Group img;
 	private ImageView imageView;

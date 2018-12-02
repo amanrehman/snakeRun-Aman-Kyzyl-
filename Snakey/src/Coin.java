@@ -1,5 +1,6 @@
 import java.io.FileInputStream; 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.Random;
 import javafx.application.Application; 
 import javafx.scene.Group; 
@@ -10,7 +11,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-public class Coin{	
+public class Coin implements Serializable{	
 	private Image image;
 	private Group img;
 	private ImageView imageView;

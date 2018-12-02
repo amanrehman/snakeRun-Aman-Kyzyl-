@@ -1,10 +1,11 @@
+import java.io.Serializable;
 import java.util.Random;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public class Block extends Rectangle{
+public class Block extends Rectangle implements Serializable{
 	private Rectangle r;
 	private int value;
 	private Text textValue;

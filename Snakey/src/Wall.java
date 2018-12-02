@@ -5,11 +5,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import javafx.application.Application;
 
-public class Wall{
+public class Wall implements Serializable{
 	Rectangle rec;
 	private int positionX;
 	private int positionY;

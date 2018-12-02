@@ -1,5 +1,6 @@
 import java.io.FileInputStream; 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.Random;
 import javafx.application.Application; 
 import javafx.scene.Group; 
@@ -12,7 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-public class Ball extends Token{	
+public class Ball extends Token implements Serializable{	
 	private int value;
 	private Text valueText;
     public int getValue() {
