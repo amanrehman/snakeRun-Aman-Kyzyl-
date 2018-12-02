@@ -24,6 +24,7 @@ public class Chain implements Serializable{
 		for(int i=0;i<5;i++) {
 			int pos=r.nextInt(positions.size()-1)+1;
 			row.get(i).getR().setX(positions.get(pos));
+			row.get(i).getR().setY(-50);
 			positions.remove(pos);
 		}
 	}

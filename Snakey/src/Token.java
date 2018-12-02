@@ -81,7 +81,9 @@ abstract class Token implements Serializable{
         imageView.setY(positionY);
         c.setTranslateX(imageView.getX()-165);
         c.setTranslateY(imageView.getY()+10);
-        root.getChildren().addAll(imageView,c);
+        
+        if(!( (root.getChildren().contains(imageView) || root.getChildren().contains(c)) ))
+        	root.getChildren().addAll(imageView,c);
     }
     public void updatemovement(Pane root, double speed) {
     	if(imageView!=null) 

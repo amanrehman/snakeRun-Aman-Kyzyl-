@@ -43,6 +43,7 @@ public class snakeygamey extends Application implements Serializable{
 	private Timeline shieldTimeline;
 	private Timeline magnetTimeline;
 	private Timeline ballTimeline;
+	private Timeline destroyTimeline;
 	private static Timeline magnetPowerTimeline;
 	private Timeline shieldPowerTimeline;
 	private Timeline wallTimeline;
@@ -68,8 +69,11 @@ public class snakeygamey extends Application implements Serializable{
 	private static int shieldSeconds;
 	private static Text coinScoreText;
 	private static final int tokenDuration=10;
+	private static int gameOverFlag=0;
+	Group rectStack = new Group();
+	Group textStack=new Group();
 	
-	private Parent createContent() throws FileNotFoundException {
+	private Parent createContent(Stage stage) throws FileNotFoundException {
 		Random r= new Random();
         gen=new Chain();
 		root=new Pane();
@@ -121,11 +125,29 @@ public class snakeygamey extends Application implements Serializable{
 		root.getChildren().addAll(scoreText,coinScoreText);
 		Button pauseButton=new Button("||");
 		root.getChildren().add(pauseButton);
-		
+
 		pauseButton.setOnAction(e ->{
 			pause();
 		});
-//        ChainGenerator();
+
+		MenuButton menuButton = new MenuButton("Options");
+		menuButton.getItems().addAll(new MenuItem("Pause"), new MenuItem("Home"));
+		root.getChildren().add(menuButton);
+
+		menuButton.getItems().get(0).setOnAction(e ->{
+			pause();
+		});
+
+		menuButton.getItems().get(1).setOnAction(e ->{
+				root.getChildren().remove(snake);
+				snake.setLength(4);
+				snake=new Snake(root);
+				score=0;
+				scoreText=new Text(Integer.toString(score));
+				coinScore=0;
+				coinScoreText=new Text(Integer.toString(coinScore));
+		});
+
 		shield =new Shield();
 		magnet=new Magnet();
 		ball= new Ball();
@@ -181,20 +203,17 @@ public class snakeygamey extends Application implements Serializable{
         ballTimeline.getKeyFrames().add(balltime);
         ballTimeline.play();
         
-        timeline = new Timeline();
+        destroyTimeline = new Timeline();
+        destroyTimeline.setCycleCount(Animation.INDEFINITE);
         KeyFrame destroytime = 
-     		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
+     		 new KeyFrame(Duration.seconds(8), e -> {
      			 	destroyFlag=1;
 	    			destroy.generatenewtoken(root);
 	    });
-        timeline.getKeyFrames().add(destroytime);
-//        KeyFrame cointime = 
-//     		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
-//     			 	coinFlag=1;
-//	    			coin.generatenewtoken(root);
-//	    });
-//        timeline.getKeyFrames().add(cointime);
-        timeline.play();
+        destroyTimeline.getKeyFrames().add(destroytime);
+        destroyTimeline.play();
+
+//      timeline.play();
         
         coinTimeline = new Timeline();
         coinTimeline.setCycleCount(coinTimeline.INDEFINITE);
@@ -208,6 +227,8 @@ public class snakeygamey extends Application implements Serializable{
 
         blockTimeline = new Timeline(
         	    new KeyFrame(Duration.seconds(2.5), e -> {
+        	    	rectStack.getChildren().clear();
+        	    	textStack.getChildren().clear();
         	        ChainGenerator();
         	    })
         	);
@@ -276,12 +297,13 @@ public class snakeygamey extends Application implements Serializable{
         if(shieldSeconds >0) {
         	shieldPowerTimeline.play();
         }
+
         return root;
     }
 	
 	private void pause() {
 		timer.stop();
-		timeline.pause();
+//		timeline.pause();
 		blockTimeline.pause();
 		wallTimeline.pause();
 		coinTimeline.pause();
@@ -290,6 +312,7 @@ public class snakeygamey extends Application implements Serializable{
 		magnetTimeline.pause();
 		shieldTimeline.pause();
 		ballTimeline.pause();
+		destroyTimeline.pause();
 		
 		Pane pausePane=new Pane();
 		Button restartButton=new Button("Restart");
@@ -302,7 +325,7 @@ public class snakeygamey extends Application implements Serializable{
 		currentStage.setScene(pause);
 		restartButton.setOnAction(e ->{
 			timer.start();
-			timeline.play();
+//			timeline.play();
 			blockTimeline.play();
 			wallTimeline.play();
 			coinTimeline.play();
@@ -311,6 +334,7 @@ public class snakeygamey extends Application implements Serializable{
 			magnetTimeline.play();
 			shieldTimeline.play();
 			ballTimeline.play();
+			destroyTimeline.play();
 			
 			currentStage.setScene(previousScene);
 		});
@@ -346,23 +370,24 @@ public class snakeygamey extends Application implements Serializable{
 				howManyToDel--;
 			}
 		}
-		
-		Group rectStack = new Group();
-		Group textStack=new Group();
 
 		for (Rectangle rect: constituentRectanglesList)
-		{	
+		{
 			int index=constituentRectanglesList.indexOf(rect);
 
 			Text val = constituentValList.get(index);
 			val.setX(rect.getX()+36);
-			val.setY(36);
+			val.setY(-16);
 			val.setFill(Color.BLACK);
 			val.setFont(Font.font ("Verdana", 15));
 			rectStack.getChildren().addAll(rect);
 			textStack.getChildren().addAll(val);
 		}
-		root.getChildren().addAll(rectStack, textStack);
+
+		if(!( root.getChildren().contains(rectStack) || root.getChildren().contains(textStack) )) {
+			root.getChildren().addAll(rectStack, textStack);
+		}
+
 	}
 
 	private void onUpdate() {
@@ -402,7 +427,7 @@ public class snakeygamey extends Application implements Serializable{
 						snake.updatemovement(root);
 						scoreText.setText(Integer.toString(score));
 					}
-					else {
+					else if(gameOverFlag==0){
 						gameOver();
 					}
 				});
@@ -498,11 +523,11 @@ public class snakeygamey extends Application implements Serializable{
 		Node snakeHead=null;
 		if(snake.getLength()!=0) {
 			snakeHead=snake.getTrail().getTailtrail().get(0);
-		
+
 		for (Block r: row) {
 			Node blk=r.getR();
 			if(snakeHead!=null)
-			if (blk.getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && blockFlag==1) {
+			if (blk.getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && blockFlag==1 && root.getChildren().contains(rectStack)) {
 				collidingFlag=1;
 //				if(snake.getLength()>=r.getValue()) {
 //					root.getChildren().remove(blk);
@@ -518,7 +543,7 @@ public class snakeygamey extends Application implements Serializable{
 
 						if(r.getValue()>5 || snake.getLength()<=r.getValue()) {
 							timer.stop();
-							timeline.pause();
+//							timeline.pause();
 							blockTimeline.pause();
 							wallTimeline.pause();
 							coinTimeline.pause();
@@ -527,6 +552,7 @@ public class snakeygamey extends Application implements Serializable{
 							magnetTimeline.pause();
 							shieldTimeline.pause();
 							ballTimeline.pause();
+							destroyTimeline.pause();
 
 //							for(int i=r.getValue();i>0;i--) {
 //								r.getTextValue().setVisible(false);
@@ -540,7 +566,7 @@ public class snakeygamey extends Application implements Serializable{
 										r.getTextValue().setText(Integer.toString(r.getValue()));
 										if(r.getValue()==0 || shieldPower==1) {
 											timer.start();
-											timeline.play();
+//											timeline.play();
 											blockTimeline.play();
 											wallTimeline.play();
 											coinTimeline.play();
@@ -549,6 +575,7 @@ public class snakeygamey extends Application implements Serializable{
 											magnetTimeline.play();
 											shieldTimeline.play();
 											ballTimeline.pause();
+											destroyTimeline.play();
 											blk.setVisible(false);
 											collidingFlag=0;
 											r.getTextValue().setVisible(false);
@@ -573,7 +600,7 @@ public class snakeygamey extends Application implements Serializable{
 //							});
 //							pause.play();
 						}
-						
+
 						else {
 							blk.setVisible(false);
 							r.getTextValue().setVisible(false);
@@ -594,20 +621,21 @@ public class snakeygamey extends Application implements Serializable{
 		}
 
 		if(destroy.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && destroyFlag==1) {
-			setSpeed(speed+0.5);
+			//rectStack.getChildren().removeAl();
+//			System.out.println(row.size());
 			collidingFlag=1;
-//			destroy.getC().setTranslateY(destroy.getC().getTranslateY()+200);
 			root.getChildren().removeAll(destroy.getC(), destroy.getImageView());
 			for(int i=0;i<row.size();i++) {
-				root.getChildren().remove(row.get(i).getR());
-//				row.remove(i);
+				burstAnimation(i*72, (int)rectStack.getChildren().get(i).getTranslateY() , 1);
+				root.getChildren().removeAll(rectStack,textStack);
 			}
-			burstAnimation(snake.getTranslateX()+175,350,1);
+			
 			destroyFlag=0;
 			collidingFlag=0;
 		}
 
 		if(ball.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && ballFlag==1) {
+//			setSpeed(speed+0.2);
 			collidingFlag=1;
 			root.getChildren().removeAll(ball.getImageView(),ball.getC(),ball.getValueText());
 			updateLength(1,ball.getValue());
@@ -672,8 +700,9 @@ public class snakeygamey extends Application implements Serializable{
 	}
 
 	private void gameOver() {
+		gameOverFlag=1;
 		timer.stop();
-        timeline.stop();
+//        timeline.stop();
         blockTimeline.stop();
         wallTimeline.stop();
         coinTimeline.stop();
@@ -681,6 +710,7 @@ public class snakeygamey extends Application implements Serializable{
         shieldPowerTimeline.stop();
         magnetTimeline.stop();
         shieldTimeline.stop();
+        destroyTimeline.stop();
         String gameover = "G4m3 0v3R";
         HBox hBox = new HBox();
         hBox.setTranslateY(300);
@@ -750,9 +780,9 @@ public class snakeygamey extends Application implements Serializable{
 			stage.setScene(diffMenuScene);
 
 			diffMenuButtons.getChildren().get(0).setOnMouseClicked(e1 -> {
-				setSpeed(5);
+				setSpeed(3);
 				try {
-					stage.setScene(new Scene(createContent()));
+					stage.setScene(new Scene(createContent(stage)));
 					stage.getScene().setOnMouseMoved(mouseHandler);
 				} catch (FileNotFoundException e4) {
 					e4.printStackTrace();
@@ -761,9 +791,9 @@ public class snakeygamey extends Application implements Serializable{
 			});
 
 			diffMenuButtons.getChildren().get(1).setOnMouseClicked(e2 -> {
-				setSpeed(5.5);
+				setSpeed(4.5);
 				try {
-					stage.setScene(new Scene(createContent()));
+					stage.setScene(new Scene(createContent(stage)));
 					stage.getScene().setOnMouseMoved(mouseHandler);
 				} catch (FileNotFoundException e4) {
 					e4.printStackTrace();
@@ -772,9 +802,9 @@ public class snakeygamey extends Application implements Serializable{
 			});
 
 			diffMenuButtons.getChildren().get(2).setOnMouseClicked(e3 -> {
-				setSpeed(6);
+				setSpeed(5);
 				try {
-					stage.setScene(new Scene(createContent()));
+					stage.setScene(new Scene(createContent(stage)));
 					stage.getScene().setOnMouseMoved(mouseHandler);
 				} catch (FileNotFoundException e4) {
 					e4.printStackTrace();
@@ -782,36 +812,6 @@ public class snakeygamey extends Application implements Serializable{
 //					System.out.println(speed);
 			});
 		});
-
-//		stage.getScene().setOnKeyPressed(event -> {
-//            switch (event.getCode()) {
-//                case LEFT:
-//                	TranslateTransition t= new TranslateTransition();
-//                	t.setDuration(Duration.millis(25));
-//                	t.setToX(snake.getTranslateX()-5);
-//                	t.setToY(snake.getTranslateY());
-//                	t.setNode(snake.getTrail().getTailtrail().get(0));
-//                	t.play();
-//                	//snake.setTranslateX(snake.getTranslateX()-5);
-//            		//snake.updateleftmovement();
-//                	break;
-//                case RIGHT:
-//                	t= new TranslateTransition();
-//                	t.setDuration(Duration.millis(25));
-//                	t.setToX(snake.getTranslateX()+5);
-//                	t.setToY(snake.getTranslateY());
-//                	t.setNode(snake.getTrail().getTailtrail().get(0));
-//                	t.play();
-//                	
-//                	//snake.setTranslateX(snake.getTranslateX()+5);
-//            		//snake.updaterightmovement();
-//            		break;
-//                default:
-//                    break;
-//            }
-//        });
-//        stage.getScene().setOnMouseMoved(mouseHandler);
-// 		});
 
 		leadButton.setOnAction(e ->{
 			Pane leadPane=new Pane();

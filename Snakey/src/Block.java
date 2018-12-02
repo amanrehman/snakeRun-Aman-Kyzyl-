@@ -96,7 +96,6 @@ public class Block extends Rectangle implements Serializable{
 
 		block.setArcWidth(60.0); 
 		block.setArcHeight(80.0);
-		System.out.println(block.getFill()+" "+ value);
 		return block;
 	}
 
