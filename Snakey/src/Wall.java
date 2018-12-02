@@ -56,7 +56,7 @@ public class Wall implements Serializable{
 
 		root.getChildren().add(rec);
 	}
-	public void updatemovent(Pane root, int speed) {
+	public void updatemovent(Pane root, double speed) {
 		if(rec!=null) 
     	{
 			if(rec.getTranslateY()<640) {

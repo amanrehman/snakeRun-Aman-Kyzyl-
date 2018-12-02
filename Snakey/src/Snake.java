@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-
 public class Snake implements Serializable{
 	private static int length;
 	private Trail trail;
@@ -51,7 +50,16 @@ public class Snake implements Serializable{
 		snakelength.setFont(Font.font ("Verdana", 15));
 		trail=new Trail(root,length,180,360,snakelength);
 	}
-
+	
+	public Snake(Pane root,int prevLength) {
+		length=prevLength;
+//		hiddenLength=92;
+		snakelength=new Text(Integer.toString(length));
+		snakelength.setFill(Color.WHITE);
+		snakelength.setFont(Font.font ("Verdana", 15));
+		trail=new Trail(root,length,180,360,snakelength);
+	}
+	
 	public void setTranslateY(int y) {
 		trail.getTailtrail().get(0).setTranslateY(y);
 	}

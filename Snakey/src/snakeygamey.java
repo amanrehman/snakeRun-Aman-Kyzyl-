@@ -1,6 +1,9 @@
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
@@ -13,6 +16,7 @@ import java.util.Scanner;
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.animation.*;
 import javafx.scene.Node;
@@ -21,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -35,11 +40,14 @@ public class snakeygamey extends Application implements Serializable{
 	private Timeline timeline;
 	private Timeline coinTimeline;
 	private Timeline blockTimeline;
-	private Timeline magnetTimeline;
 	private Timeline shieldTimeline;
+	private Timeline magnetTimeline;
+	private Timeline ballTimeline;
+	private static Timeline magnetPowerTimeline;
+	private Timeline shieldPowerTimeline;
 	private Timeline wallTimeline;
     private Pane root;
-	private static int speed=4;
+	private static double speed=4;
 	private Shield shield;
 	private Magnet magnet;
 	private Ball ball;
@@ -49,14 +57,15 @@ public class snakeygamey extends Application implements Serializable{
 	private int blockFlag;
 	private int ballFlag,shieldFlag,magnetFlag,destroyFlag,coinFlag;
 	private int wallFlag;
-	private int shieldPower;
+	private static int shieldPower;
 	private int collidingFlag;
-	private int score,coinScore;
+	private static int score;
+	private static int coinScore;
 	private static Text scoreText;
 	private static Text magnetTimeText;
 	private static Text shieldTimeText;
-	private int magnetSeconds;
-	private int shieldSeconds;
+	private static int magnetSeconds;
+	private static int shieldSeconds;
 	private static Text coinScoreText;
 	private static final int tokenDuration=10;
 	
@@ -65,8 +74,8 @@ public class snakeygamey extends Application implements Serializable{
         gen=new Chain();
 		root=new Pane();
 		root.setStyle("-fx-background-color: black;");
-		snake= new Snake(root);
 		root.setPrefSize(360, 640);							//size of window.
+		serialise(root);
 		
 		shield =new Shield();
 		magnet=new Magnet();
@@ -77,34 +86,37 @@ public class snakeygamey extends Application implements Serializable{
 		blockFlag=0;
 		collidingFlag=0;
 		shieldPower=0;
-		wallFlag=0;
-		score=0;
+		wallFlag=0; 
+		
 		scoreText=new Text(Integer.toString(score));
 		scoreText.setFill(Color.WHITE);
 		scoreText.setFont(Font.font ("Verdana", 15));
 		scoreText.setX(320);
 		scoreText.setY(40);
 		
-		coinScore=0;
 		coinScoreText=new Text(Integer.toString(coinScore));
 		coinScoreText.setFill(Color.GOLD);
 		coinScoreText.setFont(Font.font ("Verdana", 15));
 		coinScoreText.setX(260);
 		coinScoreText.setY(40);
 		
-		magnetSeconds=25;
 		magnetTimeText=new Text(Integer.toString(magnetSeconds));
 		magnetTimeText.setFill(Color.WHITE);
 		magnetTimeText.setFont(Font.font ("Verdana", 15));
 		magnetTimeText.setX(200);
 		magnetTimeText.setY(40);
+		if((!root.getChildren().contains(magnetTimeText)) && magnetSeconds>0) {
+			root.getChildren().add(magnetTimeText);
+		}
 		
-		shieldSeconds=15;
 		shieldTimeText=new Text(Integer.toString(shieldSeconds));
 		shieldTimeText.setFill(Color.WHITE);
 		shieldTimeText.setFont(Font.font ("Verdana", 15));
-		shieldTimeText.setX(160);
+		shieldTimeText.setX(140);
 		shieldTimeText.setY(40);
+		if((!root.getChildren().contains(shieldTimeText)) && shieldSeconds>0) {
+			root.getChildren().add(shieldTimeText);
+		}
 		
 		root.getChildren().addAll(scoreText,coinScoreText);
 		Button pauseButton=new Button("||");
@@ -136,29 +148,40 @@ public class snakeygamey extends Application implements Serializable{
             }
         };
         timer.start();
-        
-        timeline = new Timeline();
-        timeline.setCycleCount(timeline.INDEFINITE);
+
+        shieldTimeline = new Timeline();
+        shieldTimeline.setCycleCount(Animation.INDEFINITE);
         KeyFrame shieldtime = 
-        		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
+        		 new KeyFrame(Duration.seconds(19.5), e -> {
         			shieldFlag=1;
  	    			shield.generatenewtoken(root);
  	    });
-        timeline.getKeyFrames().add(shieldtime);
+        shieldTimeline.getKeyFrames().add(shieldtime);
+        shieldTimeline.play();
+        
+        magnetTimeline = new Timeline();
+        magnetTimeline.setCycleCount(Animation.INDEFINITE);
         KeyFrame magnettime = 
-       		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
+       		 new KeyFrame(Duration.seconds(15.5), e -> {
        			 	magnetFlag=1;
 	    			magnet.generatenewtoken(root);
 	    });
-        timeline.getKeyFrames().add(magnettime);
+        magnetTimeline.getKeyFrames().add(magnettime);
+        magnetTimeline.play();
+        
+        ballTimeline = new Timeline();
+        ballTimeline.setCycleCount(Animation.INDEFINITE);
         KeyFrame balltime = 
-      		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
+      		 new KeyFrame(Duration.seconds(3), e -> {
       			 	ballFlag=1;
 	    			ball.generatenewtoken(root);
 	    			ball.setValue(ball.generatenevalue());
 	    			ball.generatenewvaluetext(root,ball.getPositionX(),ball.getPositionY());
 	    });
-        timeline.getKeyFrames().add(balltime);
+        ballTimeline.getKeyFrames().add(balltime);
+        ballTimeline.play();
+        
+        timeline = new Timeline();
         KeyFrame destroytime = 
      		 new KeyFrame(Duration.seconds(r.nextInt(tokenDuration)), e -> {
      			 	destroyFlag=1;
@@ -172,7 +195,6 @@ public class snakeygamey extends Application implements Serializable{
 //	    });
 //        timeline.getKeyFrames().add(cointime);
         timeline.play();
-
         
         coinTimeline = new Timeline();
         coinTimeline.setCycleCount(coinTimeline.INDEFINITE);
@@ -193,8 +215,7 @@ public class snakeygamey extends Application implements Serializable{
         blockTimeline.play();
 
         wallTimeline = new Timeline(
-        	    new KeyFrame(Duration.seconds(2.5
-        	    		), e -> {
+        	    new KeyFrame(Duration.seconds(2.5), e -> {
         	        wall.create(root);
         	    })
         	);
@@ -202,11 +223,14 @@ public class snakeygamey extends Application implements Serializable{
         wallTimeline.play();
         
         
-        magnetTimeline = new Timeline(
-        	    new KeyFrame(Duration.seconds(0.5
+        magnetPowerTimeline = new Timeline(
+        	    new KeyFrame(Duration.seconds(1
         	    		), e -> {
-        	    	magnetTimeText.setText(Integer.toString(magnetSeconds--));
-	      			if(root.getChildren().contains(coin.getImageView()))
+        	    	if(magnetSeconds>0) 
+        	    	{
+        	    		magnetTimeText.setText(Integer.toString(magnetSeconds--));
+        	    	}
+	      			if(root.getChildren().contains(coin.getImageView())&& magnetSeconds>0)
 	    			{
 	    				root.getChildren().removeAll(coin.getC(),coin.getImageView());
 	    				coinScore=coinScore+1;
@@ -214,30 +238,44 @@ public class snakeygamey extends Application implements Serializable{
 	    				burstAnimation((int)coin.getC().getTranslateX(),(int)coin.getC().getTranslateY(),2);
 	    				//burstAnimation(snake.getTranslateX()+175,350,1);
 	    			}
-	      			if(magnetSeconds==0) {
+	      			if((!root.getChildren().contains(magnetTimeText)) && magnetSeconds>0) {
+	      				root.getChildren().add(magnetTimeText);
+	      			}
+	      			if(magnetSeconds<=0) {
 	      				root.getChildren().remove(magnetTimeText);
 	      			}
         	    })
         	);
-        magnetTimeline.setCycleCount(26);
-
-        shieldTimeline = new Timeline(
+        magnetPowerTimeline.setCycleCount(Animation.INDEFINITE);
+        if(magnetSeconds >0) {
+        	magnetPowerTimeline.play();
+        }
+        
+        shieldPowerTimeline = new Timeline(
         	    new KeyFrame(Duration.seconds(1
         	    		), e -> {
-        	    	shieldTimeText.setText(Integer.toString(shieldSeconds--));
-        	    	
-	      			if(shieldSeconds==0) {
+        	    	if(shieldSeconds>0)
+        	    	{	
+        	    		shieldPower=1;
+        	    		shieldTimeText.setText(Integer.toString(shieldSeconds--));
+        	    	}
+        	    	else{
 	      				shieldPower=0;
 	      				root.getChildren().remove(shieldTimeText);
 	      			}
-	      			
+        	    	if((!root.getChildren().contains(shieldTimeText)) && shieldSeconds>0) {
+	      				root.getChildren().add(shieldTimeText);
+	      			}
+
 //	      			else {
 //	      				System.out.println("off"+shieldPower);
 //	      			}
         	    })
         	);
-        shieldTimeline.setCycleCount(Animation.INDEFINITE);
-
+        shieldPowerTimeline.setCycleCount(Animation.INDEFINITE);
+        if(shieldSeconds >0) {
+        	shieldPowerTimeline.play();
+        }
         return root;
     }
 	
@@ -247,8 +285,12 @@ public class snakeygamey extends Application implements Serializable{
 		blockTimeline.pause();
 		wallTimeline.pause();
 		coinTimeline.pause();
+		magnetPowerTimeline.pause();
+		shieldPowerTimeline.pause();
+		magnetTimeline.pause();
 		shieldTimeline.pause();
-
+		ballTimeline.pause();
+		
 		Pane pausePane=new Pane();
 		Button restartButton=new Button("Restart");
 		pausePane.getChildren().add(restartButton);
@@ -264,7 +306,12 @@ public class snakeygamey extends Application implements Serializable{
 			blockTimeline.play();
 			wallTimeline.play();
 			coinTimeline.play();
+			shieldPowerTimeline.play();
+			magnetPowerTimeline.play();
+			magnetTimeline.play();
 			shieldTimeline.play();
+			ballTimeline.play();
+			
 			currentStage.setScene(previousScene);
 		});
 	}
@@ -287,10 +334,10 @@ public class snakeygamey extends Application implements Serializable{
 		double probability= ran.nextDouble();
 		int howManyToDel=ran.nextInt(2)+2;
 
-		if(probability<0.45) {
+		if(probability<0.25) {
 			while(howManyToDel>0) {
 				int index=ran.nextInt(constituentRectanglesList.size()-1)+1;
-				
+
 				if(row.get(index).getValue()>snake.getLength()) {
 					constituentRectanglesList.remove(index);
 					constituentValList.remove(index);
@@ -475,7 +522,11 @@ public class snakeygamey extends Application implements Serializable{
 							blockTimeline.pause();
 							wallTimeline.pause();
 							coinTimeline.pause();
+							magnetPowerTimeline.pause();
+							shieldPowerTimeline.pause();
+							magnetTimeline.pause();
 							shieldTimeline.pause();
+							ballTimeline.pause();
 
 //							for(int i=r.getValue();i>0;i--) {
 //								r.getTextValue().setVisible(false);
@@ -484,15 +535,20 @@ public class snakeygamey extends Application implements Serializable{
 								pause.setOnFinished(event -> {
 									if(snake.getLength()>0) {
 										r.setValue(r.getValue()-1);
-										burstAnimation(snake.getTranslateX()+175,350,1);
+										if(shieldPower==0)
+											burstAnimation(snake.getTranslateX()+175,350,1);
 										r.getTextValue().setText(Integer.toString(r.getValue()));
-										if(r.getValue()==0 ) {
+										if(r.getValue()==0 || shieldPower==1) {
 											timer.start();
 											timeline.play();
 											blockTimeline.play();
 											wallTimeline.play();
 											coinTimeline.play();
+											shieldPowerTimeline.play();
+											magnetPowerTimeline.play();
+											magnetTimeline.play();
 											shieldTimeline.play();
+											ballTimeline.pause();
 											blk.setVisible(false);
 											collidingFlag=0;
 											r.getTextValue().setVisible(false);
@@ -538,6 +594,7 @@ public class snakeygamey extends Application implements Serializable{
 		}
 
 		if(destroy.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && destroyFlag==1) {
+			setSpeed(speed+0.5);
 			collidingFlag=1;
 //			destroy.getC().setTranslateY(destroy.getC().getTranslateY()+200);
 			root.getChildren().removeAll(destroy.getC(), destroy.getImageView());
@@ -575,32 +632,26 @@ public class snakeygamey extends Application implements Serializable{
 		if(magnet.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && magnetFlag==1) {
 			collidingFlag=1;
 			root.getChildren().removeAll(magnet.getC(),magnet.getImageView());	
-
-			magnetSeconds=25;
-			if(root.getChildren().contains(magnetTimeText))
-				magnetSeconds=25;
-			else
+			magnetSeconds=10;
+			if(!root.getChildren().contains(magnetTimeText)) {
 				root.getChildren().add(magnetTimeText);
-		    magnetTimeline.play();
+			}
+		    magnetPowerTimeline.play();
+		    burstAnimation(snake.getTranslateX()+175,350,1);
 			magnetFlag=0;
 			collidingFlag=0;
 		}
 
 		if(shield.getC().getBoundsInParent().intersects(snakeHead.getBoundsInParent()) && shieldFlag==1) {
 			collidingFlag=1;
+			root.getChildren().removeAll(shield.getC(), shield.getImageView());
 			shieldPower=1;
 			shieldSeconds=15;
-			if(root.getChildren().contains(shieldTimeText))
-				shieldSeconds=15;
-			else
+			if(!root.getChildren().contains(shieldTimeText))
 				root.getChildren().add(shieldTimeText);
-			shieldTimeline.play();
-
-//			System.out.println("play");
-			root.getChildren().removeAll(shield.getC(), shield.getImageView());
-
+			shieldPowerTimeline.play();
 			burstAnimation(snake.getTranslateX()+175,350,1);
-//			shieldFlag=0;
+			shieldFlag=0;
 			collidingFlag=0;
 		}
 		
@@ -626,6 +677,9 @@ public class snakeygamey extends Application implements Serializable{
         blockTimeline.stop();
         wallTimeline.stop();
         coinTimeline.stop();
+		magnetPowerTimeline.stop();
+        shieldPowerTimeline.stop();
+        magnetTimeline.stop();
         shieldTimeline.stop();
         String gameover = "G4m3 0v3R";
         HBox hBox = new HBox();
@@ -647,7 +701,7 @@ public class snakeygamey extends Application implements Serializable{
         }
 	}
 
-	private static void setSpeed(int s) {
+	private static void setSpeed(double s) {
 		speed=s;
 	}
 
@@ -696,7 +750,7 @@ public class snakeygamey extends Application implements Serializable{
 			stage.setScene(diffMenuScene);
 
 			diffMenuButtons.getChildren().get(0).setOnMouseClicked(e1 -> {
-				setSpeed(4);
+				setSpeed(5);
 				try {
 					stage.setScene(new Scene(createContent()));
 					stage.getScene().setOnMouseMoved(mouseHandler);
@@ -707,7 +761,7 @@ public class snakeygamey extends Application implements Serializable{
 			});
 
 			diffMenuButtons.getChildren().get(1).setOnMouseClicked(e2 -> {
-				setSpeed(5);
+				setSpeed(5.5);
 				try {
 					stage.setScene(new Scene(createContent()));
 					stage.getScene().setOnMouseMoved(mouseHandler);
@@ -778,6 +832,22 @@ public class snakeygamey extends Application implements Serializable{
 				stage.setScene(previousScreen);
 			});
 		});    
+		
+		stage.setOnHiding(new EventHandler<WindowEvent>() {
+	         @Override
+	         public void handle(WindowEvent event) {
+	             Platform.runLater(new Runnable() {
+
+	                 @Override
+	                 public void run() {
+	                     System.out.println("Application Closed by click to Close Button(X)");
+	                     deserialise();
+	                     System.exit(0);
+	                 }
+	             });
+	         }
+	     });
+		
 	}
 
 	EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
@@ -844,17 +914,74 @@ public class snakeygamey extends Application implements Serializable{
 		try {
 			out = new ObjectOutputStream(new FileOutputStream("db.txt"));
 			out.writeObject(snake.getLength());
-			out.writeObject(scoreText);
-			out.writeObject(coinScoreText);
+			System.out.println(score);
+			out.writeObject(score);
+			out.writeObject(coinScore);
+			out.writeObject(magnetSeconds);
+			out.writeObject(shieldSeconds);
 			out.flush();
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println(e.getMessage());
 		} finally {
 			try {
 				out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+	public static void serialise(Pane root) {
+
+		System.out.println("Fetching Database...");
+		ObjectInputStream in=null;
+		try {
+			in = new ObjectInputStream(new FileInputStream("db.txt"));
+			int length=(int)in.readObject();
+			if(length==0) {
+				System.out.println("New Game");
+				snake= new Snake(root,4);
+				score=0;
+				coinScore=0;
+				magnetSeconds=0;
+				shieldSeconds=0;
+			}
+			else {
+				System.out.println("Continuing Game");
+				snake= new Snake(root,length);
+				score=(int)in.readObject();
+				coinScore=(int)in.readObject();
+				magnetSeconds=(int)in.readObject();
+				shieldSeconds=(int)in.readObject();
+			}
+		}
+		catch(Exception e){
+			//System.out.println(e.getClass().getName());
+			if(e.getClass().getName()=="java.io.FileNotFoundException") {
+				File tmp = new File("./","db.txt");
+				try {
+					tmp.createNewFile();
+				}
+				catch(Exception e2) {
+					System.out.println(e.getMessage());
+					e2.getStackTrace();
+				}
+				snake= new Snake(root,4);
+				score=0;
+				coinScore=0;
+				magnetSeconds=0;
+				shieldSeconds=0;
+			}
+			else {
+				System.out.println(e.getMessage());
+			}
+		}
+		finally {
+			try {
+				in.close();
+			} catch (Exception e2) {
+				//e2.printStackTrace();
 			}
 		}
 	}
