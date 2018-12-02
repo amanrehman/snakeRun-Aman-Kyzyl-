@@ -29,7 +29,8 @@ public class Chain implements Serializable{
 	}
 
 	public Block newBlockGenerator() {
-		return Block.newBlock();
+		Block b=new Block();
+		return b.newBlock();
 	}
 
 	public void flushAndRefreshPositions() {

@@ -6,18 +6,20 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class Block extends Rectangle implements Serializable{
+	static Random ran=new Random();
 	private Rectangle r;
 	private int value;
 	private Text textValue;
 	private int positionX;
+	private Snake s;
 
 	public Block() {
 		r=new Rectangle();
 		r.setArcWidth(30.0); 
 		r.setArcHeight(20.0);
-		textValue=new Text("1");
+		value = generateValue(ran.nextInt(2));
+		textValue=new Text(Integer.toString(value));
 		textValue.setFont(Font.font ("Verdana", 20));
-		value = 1;
 		positionX=-1;
 	}
 		
@@ -65,23 +67,41 @@ public class Block extends Rectangle implements Serializable{
 	private void convertToText() {
 		textValue=new Text(Integer.toString(value));
 	}
-	private int generateValue() {
-		Random r=new Random();
-		value=(int) r.nextInt(10);
+
+	private int generateValue(int v) {
+		int min = 1;
+		int max = 40;
+		int snakeLen=Snake.getLength();
+
+		if(v==0) value = ran.nextInt(max-min+1)+min;
+		else value = ran.nextInt((snakeLen-2)-min+1)+min;
+		setValue(value);
 
 		return value;
 	}
 
 	public Rectangle generateBlock() {
-		Rectangle block = new Rectangle(75, 75, Color.web("#EDF060"));
+		Rectangle block;
+
+		generateValue(ran.nextInt(2));
+		if(value>=1 && value<=5) block = new Rectangle(75, 75, Color.AQUA);
+		else if(value>=6 && value<=10) block = new Rectangle(75, 75, Color.MEDIUMSPRINGGREEN);
+		else if(value>=11 && value<=15) block = new Rectangle(75, 75, Color.LAWNGREEN);
+		else if(value>=16 && value<=20) block = new Rectangle(75, 75, Color.GREEN);
+		else if(value>=21 && value<=25) block = new Rectangle(75, 75, Color.ORANGE);
+		else if(value>=26 && value<=30) block = new Rectangle(75, 75, Color.YELLOW);
+		else if(value>=31 && value<=35) block = new Rectangle(75, 75, Color.HOTPINK);
+		else block = new Rectangle(75, 75, Color.RED);
+
 		block.setArcWidth(40.0); 
 		block.setArcHeight(30.0);
+		System.out.println(block.getFill());
 		return block;
 	}
 
-	public static Block newBlock() {
+	public Block newBlock() {
 		Block b= new Block();
-		return new Block(b.generateBlock(), b.generateValue());
+		return new Block(b.generateBlock(), getValue());
 	}
 				
 //	public static void main(String[] args) {

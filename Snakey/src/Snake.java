@@ -6,13 +6,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+
 public class Snake implements Serializable{
-	private int length;
+	private static int length;
 	private Trail trail;
 	private int speed;
 	private Text snakelength;
 
-	public int getLength() {
+	public static int getLength() {
 		return length;
 	}
 	public void setLength(int length) {

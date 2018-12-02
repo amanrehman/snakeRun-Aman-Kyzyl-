@@ -287,12 +287,15 @@ public class snakeygamey extends Application implements Serializable{
 		double probability= ran.nextDouble();
 		int howManyToDel=ran.nextInt(2)+2;
 
-		if(probability<1) {
+		if(probability<0.45) {
 			while(howManyToDel>0) {
 				int index=ran.nextInt(constituentRectanglesList.size()-1)+1;
-				constituentRectanglesList.remove(index);
-				constituentValList.remove(index);
-				row.remove(index);
+				
+				if(row.get(index).getValue()>snake.getLength()) {
+					constituentRectanglesList.remove(index);
+					constituentValList.remove(index);
+					row.remove(index);
+				}
 				howManyToDel--;
 			}
 		}
